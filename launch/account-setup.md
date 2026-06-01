@@ -1,5 +1,7 @@
 # Account Setup
 
+This file is an internal launch note. It is not an instruction to create external accounts, submit posts, send newsletters, publish links, or contact users without explicit approval.
+
 Prepare accounts before launch week and send all traffic to the GitHub repo:
 
 https://github.com/kaibuild/exposemap
