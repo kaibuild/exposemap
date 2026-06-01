@@ -6,6 +6,8 @@ labels: enhancement
 assignees: ""
 ---
 
+Please keep requests scoped to local, read-only Docker Compose review. ExposeMap does not perform live network scans, connect to containers, provide hosted monitoring, or accept private setup review requests.
+
 ## Problem
 
 What problem would this solve?
@@ -27,3 +29,11 @@ services:
   app:
     image: example/app
 ```
+
+## Scope Check
+
+- [ ] This can be implemented from Compose configuration only.
+- [ ] This does not require live network scanning.
+- [ ] This does not require connecting to containers.
+- [ ] This does not require hosted/cloud functionality.
+- [ ] This does not require private infrastructure details.
