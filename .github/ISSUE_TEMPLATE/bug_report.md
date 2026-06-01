@@ -37,7 +37,9 @@ services:
     image: example/app
 ```
 
-## Logs
+## Logs Without Secrets
+
+Do not include tokens, credentials, private domains, secrets, or sensitive infrastructure details. Redact them before posting.
 
 ```text
 Paste relevant logs here.
