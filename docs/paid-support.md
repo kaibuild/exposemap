@@ -1,8 +1,8 @@
-# Paid Support and Early Access
+# Future Hosted Options
 
 ExposeMap CLI is free and open source.
 
-The hosted SelfHostGuard Cloud dashboard is not available yet. This document is for collecting interest and shaping what may be useful later.
+The hosted SelfHostGuard Cloud dashboard is not available. This document records possible future directions only. It does not create an intake path, ordering path, available service, or service promise.
 
 ## Possible Hosted Dashboard Features
 
@@ -11,15 +11,15 @@ The hosted SelfHostGuard Cloud dashboard is not available yet. This document is 
 - exposure diffs
 - alerts for newly exposed services
 - GitHub Actions integration
-- Slack / Discord alerts
+- chat and webhook alerts
 - multi-stack monitoring
 - team reports
 
 These are possible future features, not a promise that they already exist.
 
-## Possible Paid Setup Review
+## Possible Future Guidance
 
-Paid setup review may be considered for people or teams who want help reviewing self-hosted exposure paths. Possible review areas:
+Setup guidance may be considered later for people or teams who want help reviewing self-hosted exposure paths. Possible review areas:
 
 - exposure map review
 - reverse proxy review
@@ -34,7 +34,4 @@ This would still be separate from real external exposure testing. ExposeMap itse
 
 Enterprise or self-hosting support may be considered later for teams that want help using ExposeMap across multiple stacks or integrating reports into internal workflows.
 
-No fixed pricing is available yet, and support is not guaranteed. For now, use the issue templates to share interest:
-
-- [Early Access Request](https://github.com/kaibuild/exposemap/issues/new?template=early_access_request.md)
-- [Setup Review Request](https://github.com/kaibuild/exposemap/issues/new?template=setup_review_request.md)
+No pricing, intake form, scheduling path, or guaranteed help is available. Do not send private Compose files, domains, credentials, or infrastructure details for review.
