@@ -1,16 +1,19 @@
-# Discord Setup
+# Future Community Note
 
-Server name: `SelfHostGuard`
+This file is an internal launch note. It is not an instruction to open a community space, invite users, publish links, or start support.
 
-## Manual Setup Steps
+No community space is available for ExposeMap. Do not ask users to join anything, and do not publish community links during the current launch preparation stage.
 
-1. Create a Discord server named `SelfHostGuard`.
-2. Use a simple icon and description focused on self-hosted exposure review and open-source tooling.
-3. Create the channels below.
-4. Add a short rule: do not post secrets, credentials, private Compose files, private domains, or sensitive infrastructure details.
-5. Pin the GitHub repo link in `#exposemap`.
+If a community channel is approved later, create a separate reviewed setup plan outside the public launch surface. User approval is required before creating any external community space.
 
-## Channels
+## Safety Notes
+
+- Do not post secrets, credentials, private Compose files, private domains, or sensitive infrastructure details.
+- Do not provide individual support commitments through public channels.
+- Do not use this note as a launch checklist.
+- Do not create or publish any external community space without explicit approval.
+
+## Possible Future Channels
 
 - `#announcements` - Release notes, important updates, and launch posts.
 - `#general` - General self-hosting and exposure review discussion.
