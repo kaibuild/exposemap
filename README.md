@@ -1,22 +1,41 @@
 # ExposeMap
 
-Open-source exposure mapper for self-hosted Docker Compose services.
+Turn your Docker Compose stack into a visual exposure map, so you can quickly see what appears exposed, internal, localhost-only, reverse-proxied, or needs review.
 
-ExposeMap scans `docker-compose.yml` files and produces local Markdown or JSON reports showing which services appear to be internal, localhost-only, directly exposed, reverse-proxy exposed, or unknown.
+In this README, "appears exposed" means published or mapped by the selected Docker Compose file. It does not mean ExposeMap has proven that a service is reachable from the internet.
 
-It is built for self-hosters, homelab users, small teams, and developers running Compose stacks on VPS, NAS, home servers, Tailscale, WireGuard, reverse proxies, or public cloud servers.
+ExposeMap runs locally and reads only the Compose file you choose. It does not upload Compose files, reports, service names, labels, secrets, or infrastructure details. It does not connect to containers, change infrastructure, or run live network scans.
+
+Point ExposeMap at a `docker-compose.yml` file and get a Markdown or JSON report you can review before deploying, share during a self-hosted setup review, or run in CI when Compose files change.
+
+```bash
+exposemap scan ./docker-compose.yml
+```
+
+Example output:
+
+| Service | Likely classification | Why it needs attention |
+| --- | --- | --- |
+| `traefik` | appears directly exposed | publishes `80:80` and `443:443` |
+| `web` | appears reverse-proxied | has Traefik routing labels |
+| `postgres` | needs review | publishes `5432:5432` |
+| `redis` | needs review | publishes `0.0.0.0:6379:6379` |
+| `admin` | localhost-only | binds to `127.0.0.1` |
+| `worker` | internal | no published ports |
+
+ExposeMap also generates a Mermaid diagram of likely exposure paths, so a Compose file becomes easier to discuss in issues, pull requests, setup reviews, and team handoffs.
 
 ## What ExposeMap Is
 
-ExposeMap is a lightweight, read-only configuration review tool. It parses Docker Compose files, applies simple exposure heuristics, and prints a report you can review or share with your team.
+ExposeMap is a lightweight, read-only configuration review tool for self-hosters, homelab users, small teams, and developers running Docker Compose on VPS, NAS, home servers, public cloud servers, Tailscale, WireGuard, or reverse proxies.
 
-ExposeMap runs locally. It does not send your Compose files, reports, service names, labels, or infrastructure details anywhere.
+It parses Docker Compose files, applies simple exposure heuristics, and prints a report showing which services appear internal, localhost-only, directly exposed from Compose configuration, reverse-proxy exposed, or unknown.
 
 ## Why ExposeMap Exists
 
 Self-hosted stacks often grow one service at a time: a database here, an admin panel there, a reverse proxy in front, maybe a VPN or tunnel later. After enough changes, it becomes hard to answer a basic question:
 
-Which services are reachable, and how?
+Which services appear published, proxied, or internal from this Compose file?
 
 ExposeMap helps make that first-pass map visible from the Compose configuration you already have.
 
@@ -26,10 +45,10 @@ ExposeMap helps make that first-pass map visible from the Compose configuration 
 - Short syntax port mappings such as `80:80`, `5432:5432`, and `127.0.0.1:8080:8080`
 - Long syntax Compose ports using `target`, `published`, and `host_ip`
 - Localhost-only bindings
-- Broad/public host bindings
+- Broad host bindings
 - Likely reverse proxy services
 - Traefik routing labels and obvious reverse proxy hints
-- Risky directly exposed database, cache, search, and admin ports
+- Risky published database, cache, search, and admin ports
 - A Mermaid diagram of likely exposure paths
 - Markdown and JSON reports for local review or CI usage
 
@@ -39,6 +58,14 @@ ExposeMap helps make that first-pass map visible from the Compose configuration 
 - homelab users
 - small teams running Docker Compose
 - developers running apps on VPS, NAS, home servers, public cloud servers, Tailscale, WireGuard, or reverse proxies
+
+## What You Get
+
+- A local Markdown report for quick review
+- JSON output for automation and CI
+- A Mermaid diagram of likely exposure paths
+- Findings for broad host bindings, localhost-only bindings, reverse proxy hints, and risky published database/cache/admin ports
+- Exit codes for CI with `--fail-on`
 
 ## Quick Start
 
@@ -141,6 +168,8 @@ The full example is available at [docs/github-actions-example.yml](docs/github-a
 
 ## Example Report
 
+ExposeMap is most useful when the report makes a risky Compose stack visible at a glance. The example below is generated from a sample stack with a reverse proxy, a web service behind that proxy, database/cache services with published ports, a localhost-only admin service, and an internal worker.
+
 ```markdown
 # ExposeMap Report
 
@@ -150,12 +179,12 @@ Total services: 6
 
 ## Exposure Summary
 
-| Service | Classification | Ports | Reverse proxy hints |
+| Service | Likely classification | Ports | Reverse proxy hints |
 | --- | --- | --- | --- |
-| traefik | directly exposed | `80:80`<br>`443:443` | proxy service |
-| web | reverse-proxy exposed | - | routing labels/env |
-| postgres | directly exposed | `5432:5432` | - |
-| redis | directly exposed | `0.0.0.0:6379:6379` | - |
+| traefik | appears directly exposed | `80:80`<br>`443:443` | proxy service |
+| web | appears reverse-proxy exposed | - | routing labels/env |
+| postgres | needs review | `5432:5432` | - |
+| redis | needs review | `0.0.0.0:6379:6379` | - |
 ```
 
 See [examples/report.md](examples/report.md) for a generated sample.
@@ -176,6 +205,36 @@ graph TD
   svc_web --> svc_postgres[postgres]
   svc_web --> svc_redis[redis]
 ```
+
+## FAQ
+
+### Does ExposeMap prove that a service is reachable from the internet?
+
+No. ExposeMap reviews Docker Compose configuration and reports service exposure hints based on what is published or mapped in that file. Firewalls, VPNs, tunnels, DNS, cloud security groups, host rules, and reverse proxies can all change real-world reachability.
+
+### Does ExposeMap upload my Compose file or report?
+
+No. ExposeMap runs locally and does not upload Compose files, generated reports, service names, labels, secrets, or infrastructure details.
+
+### Does ExposeMap inspect secrets or connect to containers?
+
+No. It does not connect to containers, read running container state, inspect secret values, or modify infrastructure.
+
+### Is this a vulnerability scanner?
+
+No. ExposeMap is a first-pass configuration review tool. It helps make likely exposure paths visible, but it does not replace external scanning, firewall review, threat modeling, or a security audit.
+
+### Why use this if I already have Traefik, Caddy, Nginx Proxy Manager, Tailscale, or WireGuard?
+
+Those tools can be part of the setup, but the Compose file can still publish ports directly, bind services broadly, or mix localhost-only and reverse-proxied services in ways that are hard to see. ExposeMap gives you a local map to review before assuming the setup is private.
+
+### What is free?
+
+The CLI, local reports, Docker usage, JSON output, CI usage, and Mermaid diagrams are free and open source.
+
+### What might be paid later?
+
+Future paid options may include setup review, managed reporting, hosted monitoring, or commercial support for teams. These are not required to use the open-source tool.
 
 ## Current Limitations
 
@@ -210,28 +269,21 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a PR.
 
 For now, GitHub issues and discussions are the best place to share examples, edge cases, and ideas. Please do not paste private Compose files, secrets, credentials, or sensitive infrastructure details into public issues.
 
-## Hosted Dashboard / Paid Support
+## Future Cloud and Support Options
 
 ExposeMap is free and open source.
 
-A hosted SelfHostGuard Cloud dashboard may come later for teams that want:
+The open-source CLI is the core product: local scanning, Markdown reports, JSON output, Docker usage, CI usage, and Mermaid diagrams should remain useful without any paid service.
 
-- scheduled exposure checks
-- scan history
-- exposure diffs over time
-- alerts when new services appear exposed
-- GitHub Actions integration
-- Slack / Discord alerts
-- multi-stack monitoring
+Future paid options may be explored if there is clear demand from self-hosters, small teams, or companies that want help operating ExposeMap across multiple stacks. Possible options include:
+
+- setup review for Docker Compose, reverse proxy, Tailscale, or WireGuard setups
+- managed reporting for multiple Compose stacks
+- scheduled checks and exposure diffs
 - team reports
+- commercial support for private self-hosted deployments
 
-This hosted dashboard does not exist yet, and ExposeMap still does not prove real internet exposure. Real external exposure testing, firewall review, DNS review, and infrastructure review remain separate work.
-
-More context is in [docs/paid-support.md](docs/paid-support.md).
-
-If you want early access, open an [Early Access Request](https://github.com/kaibuild/exposemap/issues/new?template=early_access_request.md).
-
-If you need help reviewing your self-hosted exposure, reverse proxy, or Tailscale setup, open a [Setup Review Request](https://github.com/kaibuild/exposemap/issues/new?template=setup_review_request.md).
+These options are not required for the OSS launch and are not active product promises yet.
 
 ## License
 
