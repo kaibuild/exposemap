@@ -9,3 +9,5 @@ It generates a Markdown report and Mermaid diagram, and currently checks common 
 It does not perform real network scans, connect to containers, modify Compose files, or send anything anywhere. It is a read-only configuration review tool based on Compose heuristics.
 
 Feedback and sanitized edge cases are welcome.
+
+Before posting, record the target Lemmy community URL, the community rules checked, and why the post fits that community. Do not post if self-promotion, project launches, or GitHub links are restricted.

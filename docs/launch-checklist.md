@@ -30,6 +30,8 @@
 
 - Pick a relevant self-hosted or open-source community.
 - Read community rules before posting.
+- Record the target community URL and rule check in the approval request.
+- Do not post if self-promotion, project launches, or GitHub links are restricted.
 - Keep the post short and technical.
 
 ## Dev.to / Medium / Hackernoon Article Checklist

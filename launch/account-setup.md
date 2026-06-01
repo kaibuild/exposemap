@@ -26,7 +26,9 @@ https://github.com/kaibuild/exposemap
 ## Lemmy
 
 - Pick relevant self-hosted and open-source communities.
-- Read each community's rules.
+- Read each community's rules before drafting the approval request.
+- Record the target community URL, the rules checked, and why the post fits that community.
+- Do not post if self-promotion, project launches, or GitHub links are restricted.
 - Keep the post shorter than the Reddit version.
 - Link to GitHub.
 

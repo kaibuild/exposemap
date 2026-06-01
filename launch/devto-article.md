@@ -102,10 +102,10 @@ It runs locally, does not modify Compose files, does not connect to containers, 
 
 That last point matters: ExposeMap is not a full security audit and does not prove internet exposure. It is a lightweight configuration review tool based on Compose heuristics.
 
-## What might come next
+## Useful feedback
 
-The CLI is free and open source. Longer term, scheduled exposure checks, scan history, exposure diffs, and alerts when new services appear exposed may be worth exploring.
+The CLI is free and open source. The most useful feedback right now is about Compose patterns that should be classified more clearly, false positives, false negatives, and sanitized examples that show common self-hosting setups.
 
-That would still be separate from real external exposure testing. The current tool remains local, read-only, and Compose-based.
+ExposeMap remains local, read-only, and Compose-based. It is separate from real external exposure testing.
 
 GitHub: https://github.com/kaibuild/exposemap

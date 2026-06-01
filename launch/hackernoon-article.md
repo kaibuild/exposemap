@@ -67,3 +67,5 @@ It runs locally, does not send Compose files anywhere, does not connect to conta
 It is intentionally a first-pass configuration review tool, not a full security audit.
 
 GitHub: https://github.com/kaibuild/exposemap
+
+Technical feedback and sanitized Compose edge cases are welcome.
