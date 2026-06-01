@@ -9,7 +9,9 @@ ExposeMap runs locally and reads only the Compose file you choose. It does not u
 Point ExposeMap at a `docker-compose.yml` file and get a Markdown or JSON report you can review before deploying, share during a self-hosted setup review, or run in CI when Compose files change.
 
 ```bash
-exposemap scan ./docker-compose.yml
+npm install
+npm run build
+node dist/cli.js scan ./docker-compose.yml
 ```
 
 Example output:
@@ -75,7 +77,7 @@ npm run build
 node dist/cli.js scan ./docker-compose.yml --format markdown
 ```
 
-When installed as a package, the CLI command is:
+If you install this repo as a local package, the bin name is:
 
 ```bash
 exposemap scan ./docker-compose.yml --format markdown
@@ -84,7 +86,7 @@ exposemap scan ./docker-compose.yml --format markdown
 Markdown remains the default output:
 
 ```bash
-exposemap scan ./docker-compose.yml
+node dist/cli.js scan ./docker-compose.yml
 ```
 
 ## JSON Output
@@ -92,7 +94,7 @@ exposemap scan ./docker-compose.yml
 Use JSON when you want CI-friendly structured output:
 
 ```bash
-exposemap scan ./docker-compose.yml --format json
+node dist/cli.js scan ./docker-compose.yml --format json
 ```
 
 The JSON report includes tool metadata, scanned file path, generated timestamp, summary counts, services, exposure map entries, findings, and the Mermaid diagram string.
@@ -102,8 +104,8 @@ The JSON report includes tool metadata, scanned file path, generated timestamp, 
 Use `--fail-on` to make ExposeMap return exit code `1` when findings at or above a chosen severity are present:
 
 ```bash
-exposemap scan ./docker-compose.yml --fail-on high
-exposemap scan ./docker-compose.yml --format json --fail-on medium
+node dist/cli.js scan ./docker-compose.yml --fail-on high
+node dist/cli.js scan ./docker-compose.yml --format json --fail-on medium
 ```
 
 Supported values:

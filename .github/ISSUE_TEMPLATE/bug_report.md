@@ -16,7 +16,7 @@ assignees: ""
 ## Command Run
 
 ```bash
-exposemap scan ./docker-compose.yml --format markdown
+node dist/cli.js scan ./docker-compose.yml --format markdown
 ```
 
 ## Expected Behavior

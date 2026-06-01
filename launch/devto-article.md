@@ -104,7 +104,7 @@ That last point matters: ExposeMap is not a full security audit and does not pro
 
 ## What might come next
 
-The CLI is free and open source. Longer term, I am collecting interest in a hosted SelfHostGuard dashboard for scheduled exposure checks, scan history, exposure diffs, and alerts when new services appear exposed.
+The CLI is free and open source. Longer term, scheduled exposure checks, scan history, exposure diffs, and alerts when new services appear exposed may be worth exploring.
 
 That would still be separate from real external exposure testing. The current tool remains local, read-only, and Compose-based.
 

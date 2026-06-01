@@ -25,6 +25,6 @@ Important caveat: it does not perform real network scans and does not prove inte
 
 The MVP checks common port mappings, localhost-only bindings, broad/public bindings, Traefik labels, likely reverse proxy services, and risky directly exposed ports like Postgres, Redis, MySQL, MongoDB, Elasticsearch, and common admin panels.
 
-I'm also collecting interest for a hosted SelfHostGuard dashboard and exposure setup reviews, but the CLI itself is free and open source.
+Longer term, hosted reporting or setup-review workflows may be worth exploring, but the CLI itself is free and open source.
 
 I would appreciate feedback, edge cases, and sanitized Compose examples. If you find it useful, a GitHub star would help other self-hosters find it.
