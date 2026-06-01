@@ -6,7 +6,7 @@ In this README, "appears exposed" means published or mapped by the selected Dock
 
 ExposeMap runs locally and reads only the Compose file you choose. It does not upload Compose files, reports, service names, labels, secrets, or infrastructure details. It does not connect to containers, change infrastructure, or run live network scans.
 
-Point ExposeMap at a `docker-compose.yml` file and get a Markdown or JSON report you can review before deploying, share during a self-hosted setup review, or run in CI when Compose files change.
+Point ExposeMap at a `docker-compose.yml` file and get a Markdown or JSON report you can review before deploying, share during an internal review, or run in CI when Compose files change.
 
 ```bash
 npm install
@@ -25,7 +25,7 @@ Example output:
 | `admin` | localhost-only | binds to `127.0.0.1` |
 | `worker` | internal | no published ports |
 
-ExposeMap also generates a Mermaid diagram of likely exposure paths, so a Compose file becomes easier to discuss in issues, pull requests, setup reviews, and team handoffs.
+ExposeMap also generates a Mermaid diagram of likely exposure paths, so a Compose file becomes easier to discuss in issues, pull requests, internal reviews, and team handoffs.
 
 ## What ExposeMap Is
 
@@ -234,9 +234,19 @@ Those tools can be part of the setup, but the Compose file can still publish por
 
 The CLI, local reports, Docker usage, JSON output, CI usage, and Mermaid diagrams are free and open source.
 
-### What might be paid later?
+### Are hosted dashboards, setup reviews, or support plans available now?
 
-Future paid options may include setup review, managed reporting, hosted monitoring, or commercial support for teams. These are not required to use the open-source tool.
+No. ExposeMap currently has no hosted dashboard, setup review intake, pricing page, paid support plan, or service promise. The OSS CLI is the product to use and evaluate today.
+
+### Can I paste my real Compose file into an issue?
+
+Please do not paste private Compose files, `.env` files, credentials, tokens, private domains, internal hostnames, or sensitive infrastructure details into public issues. Reduce the case to the smallest sanitized snippet that still shows the behavior.
+
+### What kind of issues are useful right now?
+
+Useful issues include parser edge cases, incorrect classifications, reverse proxy label examples, unclear report wording, Docker usage problems, CI usage problems, and sanitized Compose examples that ExposeMap should handle better.
+
+See [docs/community.md](docs/community.md) for issue and contribution guidance.
 
 ## Current Limitations
 
@@ -269,23 +279,19 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a PR.
 
 ## Community
 
-For now, GitHub issues and discussions are the best place to share examples, edge cases, and ideas. Please do not paste private Compose files, secrets, credentials, or sensitive infrastructure details into public issues.
+For now, GitHub issues are the best place to share sanitized examples, edge cases, and ideas. Please do not paste private Compose files, secrets, credentials, private domains, internal hostnames, or sensitive infrastructure details into public issues.
 
-## Future Cloud and Support Options
+Read [docs/community.md](docs/community.md) before opening an issue.
+
+Issue templates are available for [bug reports](.github/ISSUE_TEMPLATE/bug_report.md), [feature requests](.github/ISSUE_TEMPLATE/feature_request.md), [questions](.github/ISSUE_TEMPLATE/question.md), and [good first issue ideas](.github/ISSUE_TEMPLATE/good_first_issue.md).
+
+## Future Notes
 
 ExposeMap is free and open source.
 
 The open-source CLI is the core product: local scanning, Markdown reports, JSON output, Docker usage, CI usage, and Mermaid diagrams should remain useful without any paid service.
 
-Future paid options may be explored if there is clear demand from self-hosters, small teams, or companies that want help operating ExposeMap across multiple stacks. Possible options include:
-
-- setup review for Docker Compose, reverse proxy, Tailscale, or WireGuard setups
-- managed reporting for multiple Compose stacks
-- scheduled checks and exposure diffs
-- team reports
-- commercial support for private self-hosted deployments
-
-These options are not required for the OSS launch and are not active product promises yet.
+A hosted dashboard, setup review intake, pricing page, paid support plan, or service promise is not available. Future options may be considered later only if the OSS project shows clear demand.
 
 ## License
 
