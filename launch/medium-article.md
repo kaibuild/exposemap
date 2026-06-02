@@ -34,11 +34,11 @@ ExposeMap parses Docker Compose configuration and reports exposure hints such as
 
 - internal
 - localhost-only
-- directly exposed from Compose config
-- reverse-proxy exposed
+- directly published in Compose config
+- likely reverse-proxy exposed from Compose labels
 - unknown
 
-It looks at common port mappings, localhost bindings, broad host bindings, Traefik-style labels, likely reverse proxy services, and directly published database, cache, search, or admin ports that deserve review.
+It looks at common port mappings, localhost bindings, broad host bindings, Traefik-style labels, likely reverse proxy services, and directly published database, cache, search, or admin ports that may deserve review.
 
 It also generates a Mermaid diagram so the likely exposure paths are easier to discuss in issues, pull requests, and internal reviews.
 
