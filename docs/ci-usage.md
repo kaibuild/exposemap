@@ -1,6 +1,6 @@
 # CI Usage
 
-ExposeMap can run in CI as a lightweight Docker Compose exposure review step. It remains local, read-only, and Compose-based.
+ExposeMap can run in CI as a lightweight Docker Compose configuration review step. It remains local, read-only, and Compose-based.
 
 ExposeMap does not prove real internet exposure, does not perform real network scans, does not connect to containers, and does not send `docker-compose.yml` files or reports anywhere.
 
@@ -9,10 +9,10 @@ ExposeMap does not prove real internet exposure, does not perform real network s
 ```bash
 npm install
 npm run build
-node dist/cli.js scan ./docker-compose.yml --format markdown
+node dist/cli.js scan ./docker-compose.yml --format table
 ```
 
-Markdown is the default:
+Table output is the default:
 
 ```bash
 node dist/cli.js scan ./docker-compose.yml
@@ -22,7 +22,7 @@ node dist/cli.js scan ./docker-compose.yml
 
 ```bash
 docker build -t exposemap .
-docker run --rm -v $(pwd):/scan exposemap scan /scan/docker-compose.yml --format markdown
+docker run --rm -v $(pwd):/scan exposemap scan /scan/docker-compose.yml --format table
 ```
 
 JSON output with a CI threshold:
@@ -44,6 +44,7 @@ The JSON report includes:
 - tool name and version
 - scanned file path
 - generated timestamp
+- disclaimers for local-only, configuration-only review
 - summary counts
 - services
 - exposure map entries
@@ -71,19 +72,20 @@ The default is `none` for backward compatibility.
 ## Exit Codes
 
 - `0` - scan completed and the `--fail-on` threshold was not violated
-- `1` - scan completed and the `--fail-on` threshold was violated
-- `2` - invalid CLI usage, unsupported options, missing files, or Compose parsing errors
+- `1` - scan failed, or scan completed and the `--fail-on` threshold was violated
+- `2` - invalid CLI usage or unsupported options
 
 ## GitHub Actions Example
 
 See [github-actions-example.yml](github-actions-example.yml).
 
-The example installs dependencies, builds ExposeMap, runs Markdown and JSON scans, and shows how to use `--fail-on high`. It uses `examples/risky-compose.yml`, so the threshold step is expected to fail; replace the path with your own Compose file in real CI.
+The example installs dependencies, builds ExposeMap, and runs table and JSON scans. Use `--fail-on` only after your team has agreed how to treat review notes in CI.
 
 ## Recommended Usage for Self-hosted Projects
 
 - Start with `--fail-on none` and review the report manually.
-- Move to `--fail-on high` once obvious risky direct exposures are understood.
+- Move to stricter `--fail-on` settings only after the output is understood.
 - Use JSON output for artifacts, pull request summaries, or later automation.
 - Keep Compose snippets in public issues sanitized.
-- Review ExposeMap findings alongside firewall rules, reverse proxy config, VPN setup, DNS, and host-level controls.
+- Review ExposeMap notes alongside firewall rules, reverse proxy config, VPN setup, DNS, and host-level controls.
+- If your Compose setup uses profiles, extends, include, anchors, merge keys, or variable interpolation, consider reviewing an expanded Compose config too.

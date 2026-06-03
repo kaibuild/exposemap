@@ -4,49 +4,51 @@ Scanned file: `examples/risky-compose.yml`
 
 Total services: 6
 
-## Exposure Summary
+## Compose Visibility Summary
 
-| Service | Classification | Ports | Reverse proxy hints |
+| Service | Looks like | Why | Notes |
 | --- | --- | --- | --- |
-| traefik | directly exposed | `80:80`<br>`443:443` | proxy service |
-| web | reverse-proxy exposed | - | routing labels/env |
-| postgres | directly exposed | `5432:5432` | - |
-| redis | directly exposed | `0.0.0.0:6379:6379` | - |
-| admin | localhost-only | `127.0.0.1:8080:8080` | - |
-| worker | internal | - | - |
+| traefik | published | ports: 80:80, ports: 443:443 | - |
+| web | unknown | proxy labels detected; note only in MVP | Reverse proxy labels are note only in MVP and are not a formal classification. |
+| postgres | published | ports: 5432:5432 | - |
+| redis | published | ports: 0.0.0.0:6379:6379 | - |
+| admin | published | ports: 127.0.0.1:8080:8080 | Host binding is local, but MVP still reports host-published ports as published. |
+| worker | internal | no host-published ports | - |
 
-## High-risk Findings
+## Review Notes
 
-### PostgreSQL appears directly exposed
+### Service exposure is unknown
 
-- Severity: high
-- Service: `postgres`
-- Rule: `risky-direct-port`
-- Evidence: `5432:5432`
-- Recommendation: Bind the port to localhost, remove the public port mapping, or place the service behind an intentionally configured reverse proxy/VPN path.
+- Level: medium
+- Service: `web`
+- Rule: `unknown-exposure`
+- Evidence: `proxy labels detected; note only in MVP`
+- Recommendation: Review this service manually, including reverse proxy, VPN, firewall, and host-level configuration.
 
-This service publishes a port commonly associated with databases, search backends, caches, or admin panels without a localhost-only binding.
+ExposeMap could not confidently classify this service from Compose configuration alone.
 
-### Redis appears directly exposed
+### Service appears internal
 
-- Severity: high
-- Service: `redis`
-- Rule: `risky-direct-port`
-- Evidence: `0.0.0.0:6379:6379`
-- Recommendation: Bind the port to localhost, remove the public port mapping, or place the service behind an intentionally configured reverse proxy/VPN path.
+- Level: low
+- Service: `worker`
+- Rule: `internal-service`
+- Evidence: `no host-published ports`
+- Recommendation: Confirm this matches the intended access path and document any proxy, VPN, or firewall assumptions.
 
-This service publishes a port commonly associated with databases, search backends, caches, or admin panels without a localhost-only binding.
+No host-published Compose ports were detected. This is not proof that the service is impossible to reach.
 
 ## Service Details
 
 ### traefik
 
-Classification: **directly exposed**
+Looks like: **published**
+
+Why: ports: 80:80, ports: 443:443
 
 Ports:
 
-- `80:80` (broad/public)
-- `443:443` (broad/public)
+- `80:80`
+- `443:443`
 
 Findings:
 
@@ -54,7 +56,9 @@ No service-specific findings.
 
 ### web
 
-Classification: **reverse-proxy exposed**
+Looks like: **unknown**
+
+Why: proxy labels detected; note only in MVP
 
 Ports:
 
@@ -62,71 +66,63 @@ Ports:
 
 Findings:
 
-No service-specific findings.
+### Service exposure is unknown
+
+- Level: medium
+- Service: `web`
+- Rule: `unknown-exposure`
+- Evidence: `proxy labels detected; note only in MVP`
+- Recommendation: Review this service manually, including reverse proxy, VPN, firewall, and host-level configuration.
+
+ExposeMap could not confidently classify this service from Compose configuration alone.
 
 ### postgres
 
-Classification: **directly exposed**
+Looks like: **published**
+
+Why: ports: 5432:5432
 
 Ports:
 
-- `5432:5432` (broad/public)
+- `5432:5432`
 
 Findings:
 
-### PostgreSQL appears directly exposed
-
-- Severity: high
-- Service: `postgres`
-- Rule: `risky-direct-port`
-- Evidence: `5432:5432`
-- Recommendation: Bind the port to localhost, remove the public port mapping, or place the service behind an intentionally configured reverse proxy/VPN path.
-
-This service publishes a port commonly associated with databases, search backends, caches, or admin panels without a localhost-only binding.
+No service-specific findings.
 
 ### redis
 
-Classification: **directly exposed**
+Looks like: **published**
+
+Why: ports: 0.0.0.0:6379:6379
 
 Ports:
 
-- `0.0.0.0:6379:6379` (broad/public)
+- `0.0.0.0:6379:6379`
 
 Findings:
 
-### Redis appears directly exposed
-
-- Severity: high
-- Service: `redis`
-- Rule: `risky-direct-port`
-- Evidence: `0.0.0.0:6379:6379`
-- Recommendation: Bind the port to localhost, remove the public port mapping, or place the service behind an intentionally configured reverse proxy/VPN path.
-
-This service publishes a port commonly associated with databases, search backends, caches, or admin panels without a localhost-only binding.
+No service-specific findings.
 
 ### admin
 
-Classification: **localhost-only**
+Looks like: **published**
+
+Why: ports: 127.0.0.1:8080:8080
 
 Ports:
 
-- `127.0.0.1:8080:8080` (localhost-only)
+- `127.0.0.1:8080:8080`
 
 Findings:
 
-### Service is localhost-only
-
-- Severity: low
-- Service: `admin`
-- Rule: `localhost-only`
-- Evidence: `127.0.0.1:8080:8080`
-- Recommendation: Keep this pattern for admin tools and databases unless broader access is intentional.
-
-All parsed port mappings are bound to localhost.
+No service-specific findings.
 
 ### worker
 
-Classification: **internal**
+Looks like: **internal**
+
+Why: no host-published ports
 
 Ports:
 
@@ -136,27 +132,27 @@ Findings:
 
 ### Service appears internal
 
-- Severity: low
+- Level: low
 - Service: `worker`
 - Rule: `internal-service`
-- Evidence: `worker`
-- Recommendation: Confirm this matches the intended access path and document any VPN or proxy assumptions.
+- Evidence: `no host-published ports`
+- Recommendation: Confirm this matches the intended access path and document any proxy, VPN, or firewall assumptions.
 
-No Compose port mappings or reverse proxy routing labels were detected.
+No host-published Compose ports were detected. This is not proof that the service is impossible to reach.
 
 ## Mermaid Diagram
 
 ```mermaid
 graph TD
-  Internet[Internet]
-  Localhost[Localhost]
-  InternalNetwork[Internal network]
-  Internet --> svc_traefik[traefik]
-  svc_traefik --> svc_web[web]
-  Internet --> svc_postgres[postgres]
-  Internet --> svc_redis[redis]
-  Localhost --> svc_admin[admin]
-  InternalNetwork --> svc_worker[worker]
+  Published[Host-published in Compose]
+  Internal[No host-published ports found]
+  Unknown[Unknown from Compose]
+  Published --> svc_traefik[traefik]
+  Published --> svc_postgres[postgres]
+  Published --> svc_redis[redis]
+  Published --> svc_admin[admin]
+  Internal --> svc_worker[worker]
+  Unknown -.-> svc_web[web]
   svc_web --> svc_postgres[postgres]
   svc_web --> svc_redis[redis]
   svc_worker --> svc_redis[redis]
@@ -166,7 +162,16 @@ graph TD
 
 - ExposeMap is a lightweight, read-only configuration review tool.
 - Results are heuristic checks based on Docker Compose configuration.
-- ExposeMap does not prove real internet exposure.
+- published means host-published in Compose, not internet-reachable.
+- internal means no host-published ports found, not impossible to reach.
 - ExposeMap does not perform real network scans.
 - ExposeMap does not connect to containers or modify Compose files.
 - Reverse proxy, firewall, VPN, DNS, cloud security group, and host-level rules can change real exposure.
+- Some Compose features, such as profiles, extends, include, anchors, merge keys, or variable interpolation, may require expanded Compose config for safer review.
+
+```text
+ExposeMap reads local Compose configuration only.
+It does not test live reachability, firewall, DNS, VPN, tunnels, cloud security groups, or vulnerabilities.
+Do not paste real Compose files or secrets into public issues. Use sanitized examples only.
+Some Compose features, such as profiles, extends, include, anchors, merge keys, or variable interpolation, may require expanded Compose config for safer review.
+```

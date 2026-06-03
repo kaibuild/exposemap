@@ -2,7 +2,7 @@
 
 ## Project Purpose
 
-ExposeMap is a TypeScript CLI tool for self-hosted Docker Compose exposure mapping. It scans Compose configuration locally and reports whether services appear internal, localhost-only, directly exposed, reverse-proxy exposed, or unknown.
+ExposeMap is a TypeScript CLI tool for self-hosted Docker Compose visibility mapping. It scans Compose configuration locally and reports whether services look `published`, `internal`, or `unknown`.
 
 ExposeMap must stay read-only in the MVP. It must not modify `docker-compose.yml`, connect to containers, scan external networks, or add hosted/cloud functionality unless explicitly requested.
 

@@ -27,6 +27,7 @@ export function parseComposeContent(content: string, filePath = "<memory>"): Com
       name,
       image: typeof value.image === "string" ? value.image : undefined,
       ports: Array.isArray(value.ports) ? value.ports : [],
+      expose: normalizeList(value.expose),
       labels: normalizeKeyValueList(value.labels),
       environment: normalizeKeyValueList(value.environment),
       dependsOn: normalizeDependsOn(value.depends_on),
@@ -35,6 +36,14 @@ export function parseComposeContent(content: string, filePath = "<memory>"): Com
   });
 
   return { filePath, services };
+}
+
+function normalizeList(value: unknown): unknown[] {
+  if (!value) {
+    return [];
+  }
+
+  return Array.isArray(value) ? value : [value];
 }
 
 function normalizeKeyValueList(value: unknown): Record<string, string> {

@@ -42,38 +42,40 @@ services:
     expect(json.tool.version).toBe(getToolVersion());
     expect(json.scannedFilePath).toBe("compose.yml");
     expect(Date.parse(json.generatedAt)).not.toBeNaN();
+    expect(json.disclaimers).toEqual(
+      expect.arrayContaining([
+        "published means host-published in Compose, not internet-reachable.",
+        "internal means no host-published ports found, not impossible to reach.",
+        "Some Compose features, such as profiles, extends, include, anchors, merge keys, or variable interpolation, may require expanded Compose config for safer review."
+      ])
+    );
     expect(json.summary).toMatchObject({
       totalServices: 5,
       internal: 1,
-      localhostOnly: 1,
-      directlyExposed: 2,
-      reverseProxyExposed: 1,
-      unknown: 0,
-      totalFindings: 3,
-      high: 1,
-      medium: 0,
-      low: 2
+      published: 3,
+      unknown: 1,
+      totalFindings: 2,
+      high: 0,
+      medium: 1,
+      low: 1
     });
     expect(json.services.find((service) => service.name === "app")).toMatchObject({
-      classification: "reverse-proxy exposed",
+      classification: "unknown",
+      why: "proxy labels detected; note only in MVP",
       labels: {
         "traefik.enable": "true"
       },
-      evidence: expect.arrayContaining(["reverse proxy routing labels/env detected"])
+      evidence: expect.arrayContaining(["proxy labels detected; note only in MVP"])
     });
     expect(json.exposureMap).toContainEqual(
       expect.objectContaining({
         service: "db",
-        classification: "directly exposed",
-        entrypoints: ["internet"],
+        classification: "published",
+        entrypoints: ["host-published-in-compose"],
         evidence: ["5432:5432"]
       })
     );
-    expect(json.findings[0]).toMatchObject({
-      ruleId: "risky-direct-port",
-      severity: "high",
-      service: "db"
-    });
+    expect(json.findings.some((finding) => finding.ruleId === "risky-direct-port")).toBe(false);
     expect(json.mermaid).toContain("graph TD");
   });
 
@@ -92,6 +94,7 @@ services:
     const parsed = JSON.parse(renderJsonReport(report));
 
     expect(parsed.tool.name).toBe("ExposeMap");
+    expect(parsed.disclaimers).toContain("published means host-published in Compose, not internet-reachable.");
     expect(parsed.summary.totalServices).toBe(1);
   });
 });

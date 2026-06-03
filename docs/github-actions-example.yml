@@ -28,16 +28,11 @@ jobs:
       - name: Build ExposeMap
         run: npm run build
 
-      - name: Generate Markdown report
-        run: node dist/cli.js scan examples/risky-compose.yml --format markdown --fail-on none
+      - name: Generate table report
+        run: node dist/cli.js scan examples/risky-compose.yml --format table --fail-on none
 
       - name: Generate JSON report
         run: node dist/cli.js scan examples/risky-compose.yml --format json --fail-on none > exposemap-report.json
-
-      - name: Enforce high-severity threshold
-        # This intentionally fails for examples/risky-compose.yml.
-        # Replace the path with your own Compose file in real CI.
-        run: node dist/cli.js scan examples/risky-compose.yml --format json --fail-on high
 
       - name: Upload JSON report
         if: always()
