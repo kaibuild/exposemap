@@ -29,6 +29,7 @@ internal means no host-published ports found, not impossible to reach.
 ExposeMap reads local Compose configuration only.
 It does not test live reachability, firewall, DNS, VPN, tunnels, cloud security groups, or vulnerabilities.
 Do not paste real Compose files or secrets into public issues. Use sanitized examples only.
+Some Compose features, such as profiles, extends, include, anchors, merge keys, or variable interpolation, may require expanded Compose config for safer review.
 
 ## What ExposeMap Is
 
@@ -102,6 +103,7 @@ Examples:
 
 - unsupported ports syntax
 - variable interpolation that needs expanded Compose config
+- profiles, extends, include, anchors, or merge keys that need expanded Compose config
 - reverse proxy labels, which are note-only in the MVP
 
 ## Quick Start
@@ -192,6 +194,7 @@ See [docs/community.md](docs/community.md) for issue and contribution guidance.
 - No Tailscale API integration
 - No hosted dashboard
 - Results are heuristic checks based on Docker Compose configuration
+- Profiles, extends, include, anchors, merge keys, and variable interpolation may need expanded Compose config for safer review
 - Reverse proxy, firewall, VPN, DNS, cloud security group, and host-level rules can change real exposure
 
 ExposeMap does not prove real internet exposure. It does not replace a full security review, external exposure scan, firewall review, or threat model.

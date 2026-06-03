@@ -1,5 +1,9 @@
 import type { ExposureReport, Finding, ServiceAnalysis } from "../types.js";
-import { CONFIGURATION_ONLY_WARNING } from "../warnings.js";
+import {
+  CLASSIFICATION_WARNING_LINES,
+  CONFIGURATION_ONLY_WARNING,
+  STATIC_COMPOSE_LIMITATION_WARNING
+} from "../warnings.js";
 
 export function renderMarkdownReport(report: ExposureReport): string {
   return [
@@ -31,14 +35,15 @@ export function renderMarkdownReport(report: ExposureReport): string {
     "",
     "- ExposeMap is a lightweight, read-only configuration review tool.",
     "- Results are heuristic checks based on Docker Compose configuration.",
-    "- published means host-published in Compose, not internet-reachable.",
-    "- internal means no host-published ports found, not impossible to reach.",
+    ...CLASSIFICATION_WARNING_LINES.map((warning) => `- ${warning}`),
     "- ExposeMap does not perform real network scans.",
     "- ExposeMap does not connect to containers or modify Compose files.",
     "- Reverse proxy, firewall, VPN, DNS, cloud security group, and host-level rules can change real exposure.",
+    `- ${STATIC_COMPOSE_LIMITATION_WARNING}`,
     "",
     "```text",
     CONFIGURATION_ONLY_WARNING,
+    STATIC_COMPOSE_LIMITATION_WARNING,
     "```",
     ""
   ].join("\n");

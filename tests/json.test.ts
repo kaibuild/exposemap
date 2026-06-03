@@ -42,6 +42,13 @@ services:
     expect(json.tool.version).toBe(getToolVersion());
     expect(json.scannedFilePath).toBe("compose.yml");
     expect(Date.parse(json.generatedAt)).not.toBeNaN();
+    expect(json.disclaimers).toEqual(
+      expect.arrayContaining([
+        "published means host-published in Compose, not internet-reachable.",
+        "internal means no host-published ports found, not impossible to reach.",
+        "Some Compose features, such as profiles, extends, include, anchors, merge keys, or variable interpolation, may require expanded Compose config for safer review."
+      ])
+    );
     expect(json.summary).toMatchObject({
       totalServices: 5,
       internal: 1,
@@ -87,6 +94,7 @@ services:
     const parsed = JSON.parse(renderJsonReport(report));
 
     expect(parsed.tool.name).toBe("ExposeMap");
+    expect(parsed.disclaimers).toContain("published means host-published in Compose, not internet-reachable.");
     expect(parsed.summary.totalServices).toBe(1);
   });
 });
