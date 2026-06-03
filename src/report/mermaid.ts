@@ -2,45 +2,24 @@ import type { ServiceAnalysis } from "../types.js";
 
 export function renderMermaidDiagram(services: ServiceAnalysis[]): string {
   const lines = ["graph TD"];
-  const reverseProxies = services.filter((service) => service.isReverseProxy);
-  const routedServices = services.filter((service) => service.hasReverseProxyRouting && !service.isReverseProxy);
-  const directlyExposed = services.filter(
-    (service) => service.classification === "directly exposed" && !service.isReverseProxy
-  );
+  const published = services.filter((service) => service.classification === "published");
   const internal = services.filter((service) => service.classification === "internal");
-  const localhostOnly = services.filter((service) => service.classification === "localhost-only");
   const unknown = services.filter((service) => service.classification === "unknown");
 
-  lines.push("  Internet[Internet]");
-  lines.push("  Localhost[Localhost]");
-  lines.push("  InternalNetwork[Internal network]");
+  lines.push("  Published[Host-published in Compose]");
+  lines.push("  Internal[No host-published ports found]");
+  lines.push("  Unknown[Unknown from Compose]");
 
-  if (reverseProxies.length > 0) {
-    for (const proxy of reverseProxies) {
-      lines.push(`  Internet --> ${nodeId(proxy.service.name)}[${escapeLabel(proxy.service.name)}]`);
-    }
-
-    for (const proxy of reverseProxies) {
-      for (const service of routedServices) {
-        lines.push(`  ${nodeId(proxy.service.name)} --> ${nodeId(service.service.name)}[${escapeLabel(service.service.name)}]`);
-      }
-    }
-  }
-
-  for (const service of directlyExposed) {
-    lines.push(`  Internet --> ${nodeId(service.service.name)}[${escapeLabel(service.service.name)}]`);
-  }
-
-  for (const service of localhostOnly) {
-    lines.push(`  Localhost --> ${nodeId(service.service.name)}[${escapeLabel(service.service.name)}]`);
+  for (const service of published) {
+    lines.push(`  Published --> ${nodeId(service.service.name)}[${escapeLabel(service.service.name)}]`);
   }
 
   for (const service of internal) {
-    lines.push(`  InternalNetwork --> ${nodeId(service.service.name)}[${escapeLabel(service.service.name)}]`);
+    lines.push(`  Internal --> ${nodeId(service.service.name)}[${escapeLabel(service.service.name)}]`);
   }
 
   for (const service of unknown) {
-    lines.push(`  Unknown[Unknown exposure] -.-> ${nodeId(service.service.name)}[${escapeLabel(service.service.name)}]`);
+    lines.push(`  Unknown -.-> ${nodeId(service.service.name)}[${escapeLabel(service.service.name)}]`);
   }
 
   addDependencyEdges(lines, services);

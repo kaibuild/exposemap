@@ -4,9 +4,7 @@ import { TOOL_NAME, getToolVersion } from "../version.js";
 interface JsonSummary {
   totalServices: number;
   internal: number;
-  localhostOnly: number;
-  directlyExposed: number;
-  reverseProxyExposed: number;
+  published: number;
   unknown: number;
   totalFindings: number;
   high: number;
@@ -17,6 +15,7 @@ interface JsonSummary {
 interface JsonService {
   name: string;
   classification: ExposureClassification;
+  why: string;
   image?: string;
   ports: JsonPort[];
   labels: Record<string, string>;
@@ -79,9 +78,7 @@ function buildSummary(report: ExposureReport): JsonSummary {
   return {
     totalServices: report.services.length,
     internal: countServices(report, "internal"),
-    localhostOnly: countServices(report, "localhost-only"),
-    directlyExposed: countServices(report, "directly exposed"),
-    reverseProxyExposed: countServices(report, "reverse-proxy exposed"),
+    published: countServices(report, "published"),
     unknown: countServices(report, "unknown"),
     totalFindings: report.findings.length,
     high: countFindings(report, "high"),
@@ -94,6 +91,7 @@ function buildService(service: ServiceAnalysis): JsonService {
   return {
     name: service.service.name,
     classification: service.classification,
+    why: service.why,
     image: service.service.image,
     ports: service.ports.map(buildPort),
     labels: service.service.labels,
@@ -127,11 +125,11 @@ function buildEvidence(service: ServiceAnalysis): string[] {
   const evidence = service.ports.map((port) => port.evidence);
 
   if (service.isReverseProxy) {
-    evidence.push("likely reverse proxy service");
+    evidence.push("likely reverse proxy service; note only in MVP");
   }
 
   if (service.hasReverseProxyRouting) {
-    evidence.push("reverse proxy routing labels/env detected");
+    evidence.push("proxy labels detected; note only in MVP");
   }
 
   if (service.ports.length === 0) {
@@ -143,14 +141,10 @@ function buildEvidence(service: ServiceAnalysis): string[] {
 
 function getEntrypoints(service: ServiceAnalysis): string[] {
   switch (service.classification) {
-    case "directly exposed":
-      return ["internet"];
-    case "localhost-only":
-      return ["localhost"];
-    case "reverse-proxy exposed":
-      return ["reverse-proxy"];
+    case "published":
+      return ["host-published-in-compose"];
     case "internal":
-      return ["internal-network"];
+      return ["no-host-published-ports-found"];
     case "unknown":
       return ["unknown"];
   }

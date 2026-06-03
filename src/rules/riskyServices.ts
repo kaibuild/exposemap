@@ -29,12 +29,12 @@ export function findRiskyDirectExposure(serviceName: string, broadPorts: PortMap
         ruleId: "risky-direct-port",
         severity: "high",
         service: serviceName,
-        title: `${matched.name} appears directly exposed`,
+        title: `${matched.name} has a host-published Compose port`,
         description:
-          "This service publishes a port commonly associated with databases, search backends, caches, or admin panels without a localhost-only binding.",
+          "This service has a host-published Compose port commonly associated with databases, search backends, caches, or admin panels.",
         evidence: port.evidence,
         recommendation:
-          "Bind the port to localhost, remove the public port mapping, or place the service behind an intentionally configured reverse proxy/VPN path."
+          "Review whether this host-published Compose port is intentional. Real reachability still depends on firewall, VPN, proxy, DNS, cloud security group, and host rules."
       }
     ];
   });

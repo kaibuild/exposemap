@@ -1,8 +1,6 @@
 export type ExposureClassification =
   | "internal"
-  | "localhost-only"
-  | "directly exposed"
-  | "reverse-proxy exposed"
+  | "published"
   | "unknown";
 
 export type Severity = "high" | "medium" | "low";
@@ -26,6 +24,7 @@ export interface ComposeService {
   name: string;
   image?: string;
   ports: unknown[];
+  expose: unknown[];
   labels: Record<string, string>;
   environment: Record<string, string>;
   dependsOn: string[];
@@ -55,6 +54,7 @@ export interface ServiceAnalysis {
   localhostPorts: PortMapping[];
   isReverseProxy: boolean;
   hasReverseProxyRouting: boolean;
+  why: string;
   findings: Finding[];
   notes: string[];
 }
