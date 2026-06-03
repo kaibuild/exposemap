@@ -44,6 +44,7 @@ The JSON report includes:
 - tool name and version
 - scanned file path
 - generated timestamp
+- disclaimers for local-only, configuration-only review
 - summary counts
 - services
 - exposure map entries
@@ -87,3 +88,4 @@ The example installs dependencies, builds ExposeMap, and runs table and JSON sca
 - Use JSON output for artifacts, pull request summaries, or later automation.
 - Keep Compose snippets in public issues sanitized.
 - Review ExposeMap notes alongside firewall rules, reverse proxy config, VPN setup, DNS, and host-level controls.
+- If your Compose setup uses profiles, extends, include, anchors, merge keys, or variable interpolation, consider reviewing an expanded Compose config too.

@@ -47,5 +47,8 @@ services:
     expect(output).toContain("internal means no host-published ports found, not impossible to reach.");
     expect(output).toContain("ExposeMap reads local Compose configuration only.");
     expect(output).toContain("Do not paste real Compose files or secrets into public issues.");
+    expect(output).toContain(
+      "Some Compose features, such as profiles, extends, include, anchors, merge keys, or variable interpolation, may require expanded Compose config for safer review."
+    );
   });
 });

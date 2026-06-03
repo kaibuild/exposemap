@@ -167,9 +167,11 @@ graph TD
 - ExposeMap does not perform real network scans.
 - ExposeMap does not connect to containers or modify Compose files.
 - Reverse proxy, firewall, VPN, DNS, cloud security group, and host-level rules can change real exposure.
+- Some Compose features, such as profiles, extends, include, anchors, merge keys, or variable interpolation, may require expanded Compose config for safer review.
 
 ```text
 ExposeMap reads local Compose configuration only.
 It does not test live reachability, firewall, DNS, VPN, tunnels, cloud security groups, or vulnerabilities.
 Do not paste real Compose files or secrets into public issues. Use sanitized examples only.
+Some Compose features, such as profiles, extends, include, anchors, merge keys, or variable interpolation, may require expanded Compose config for safer review.
 ```

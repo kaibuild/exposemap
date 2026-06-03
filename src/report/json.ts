@@ -1,5 +1,6 @@
 import type { ExposureClassification, ExposureReport, Finding, PortMapping, ServiceAnalysis } from "../types.js";
 import { TOOL_NAME, getToolVersion } from "../version.js";
+import { REPORT_WARNING_LINES } from "../warnings.js";
 
 interface JsonSummary {
   totalServices: number;
@@ -47,6 +48,7 @@ export interface JsonExposureReport {
   };
   scannedFilePath: string;
   generatedAt: string;
+  disclaimers: string[];
   summary: JsonSummary;
   services: JsonService[];
   exposureMap: JsonExposureMapEntry[];
@@ -62,6 +64,7 @@ export function buildJsonReport(report: ExposureReport): JsonExposureReport {
     },
     scannedFilePath: report.filePath,
     generatedAt: report.generatedAt,
+    disclaimers: REPORT_WARNING_LINES,
     summary: buildSummary(report),
     services: report.services.map(buildService),
     exposureMap: report.services.map(buildExposureMapEntry),
