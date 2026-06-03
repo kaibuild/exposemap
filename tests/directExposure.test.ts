@@ -16,7 +16,7 @@ describe("direct exposure detection", () => {
     expect(hasDirectExposure(ports)).toBe(true);
   });
 
-  it("does not flag localhost-only bindings", () => {
+  it("does not flag localhost-bound ports as broad host bindings", () => {
     const ports = parsePortMappings(["127.0.0.1:5432:5432"]);
 
     expect(hasDirectExposure(ports)).toBe(false);

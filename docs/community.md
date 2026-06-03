@@ -8,7 +8,7 @@ Use GitHub issues for:
 
 - incorrect or confusing classifications
 - parser edge cases
-- reverse proxy labels or Compose patterns ExposeMap should understand
+- reverse proxy labels or Compose patterns ExposeMap should treat as note-only context
 - documentation gaps
 - Docker or CI usage problems
 - small contribution ideas
@@ -32,7 +32,7 @@ Good first areas include:
 - docs wording improvements
 - sanitized Compose examples
 - parser edge cases with a small fixture
-- reverse proxy label hints
+- note-only reverse proxy label hints
 - report wording and Markdown formatting
 - tests for an existing rule
 - CI and Docker usage documentation
@@ -57,7 +57,10 @@ If a real setup triggered the issue, replace names and values with neutral place
 
 ## What ExposeMap Can and Cannot Confirm
 
-ExposeMap can show what appears published, localhost-only, reverse-proxied, internal, or uncertain from a Docker Compose file.
+ExposeMap can show whether a service looks `published`, `internal`, or `unknown` from a Docker Compose file.
+
+published means host-published in Compose, not internet-reachable.
+internal means no host-published ports found, not impossible to reach.
 
 ExposeMap cannot prove real internet reachability. Firewalls, DNS, VPNs, tunnels, cloud security groups, reverse proxies, host rules, and runtime state can all change what is actually reachable.
 

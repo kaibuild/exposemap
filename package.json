@@ -9,7 +9,7 @@
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
-    "scan:example": "node dist/cli.js scan examples/risky-compose.yml --format markdown"
+    "scan:example": "node dist/cli.js scan examples/risky-compose.yml --format table"
   },
   "keywords": [
     "docker",

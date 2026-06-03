@@ -4,10 +4,11 @@ import { getExitCodeForReport, parseFailOnThreshold } from "./failOn.js";
 import { scanComposeFile } from "./index.js";
 import { renderJsonReport } from "./report/json.js";
 import { renderMarkdownReport } from "./report/markdown.js";
+import { renderTableReport } from "./report/table.js";
 import { getToolVersion } from "./version.js";
 
 const program = new Command();
-const supportedFormats = new Set(["markdown", "json"]);
+const supportedFormats = new Set(["table", "markdown", "json"]);
 
 program
   .name("exposemap")
@@ -18,7 +19,7 @@ program
 program
   .command("scan")
   .argument("<compose-file>", "Path to docker-compose.yml")
-  .option("--format <format>", "Report format: markdown or json", "markdown")
+  .option("--format <format>", "Report format: table, markdown, or json", "table")
   .option("--fail-on <severity>", "Exit 1 on findings at or above severity: high, medium, low, none", "none")
   .description("Scan a Docker Compose file and print an exposure report")
   .action(async (composeFile: string, options: { format: string; failOn: string }) => {
@@ -26,7 +27,7 @@ program
     const failOn = parseFailOnThreshold(options.failOn.toLowerCase());
 
     if (!supportedFormats.has(format)) {
-      console.error(`Unsupported format: ${options.format}. Supported formats: markdown, json.`);
+      console.error(`Unsupported format: ${options.format}. Supported formats: table, markdown, json.`);
       process.exitCode = 2;
       return;
     }
@@ -39,13 +40,14 @@ program
 
     try {
       const report = await scanComposeFile(composeFile);
-      const output = format === "json" ? renderJsonReport(report) : renderMarkdownReport(report);
+      const output =
+        format === "json" ? renderJsonReport(report) : format === "markdown" ? renderMarkdownReport(report) : renderTableReport(report);
       process.stdout.write(output);
       process.exitCode = getExitCodeForReport(report, failOn);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       console.error(`ExposeMap failed: ${message}`);
-      process.exitCode = 2;
+      process.exitCode = 1;
     }
   });
 

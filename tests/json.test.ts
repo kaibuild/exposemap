@@ -45,35 +45,30 @@ services:
     expect(json.summary).toMatchObject({
       totalServices: 5,
       internal: 1,
-      localhostOnly: 1,
-      directlyExposed: 2,
-      reverseProxyExposed: 1,
-      unknown: 0,
-      totalFindings: 3,
-      high: 1,
-      medium: 0,
-      low: 2
+      published: 3,
+      unknown: 1,
+      totalFindings: 2,
+      high: 0,
+      medium: 1,
+      low: 1
     });
     expect(json.services.find((service) => service.name === "app")).toMatchObject({
-      classification: "reverse-proxy exposed",
+      classification: "unknown",
+      why: "proxy labels detected; note only in MVP",
       labels: {
         "traefik.enable": "true"
       },
-      evidence: expect.arrayContaining(["reverse proxy routing labels/env detected"])
+      evidence: expect.arrayContaining(["proxy labels detected; note only in MVP"])
     });
     expect(json.exposureMap).toContainEqual(
       expect.objectContaining({
         service: "db",
-        classification: "directly exposed",
-        entrypoints: ["internet"],
+        classification: "published",
+        entrypoints: ["host-published-in-compose"],
         evidence: ["5432:5432"]
       })
     );
-    expect(json.findings[0]).toMatchObject({
-      ruleId: "risky-direct-port",
-      severity: "high",
-      service: "db"
-    });
+    expect(json.findings.some((finding) => finding.ruleId === "risky-direct-port")).toBe(false);
     expect(json.mermaid).toContain("graph TD");
   });
 

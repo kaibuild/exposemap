@@ -3,7 +3,7 @@ import { parseComposeContent } from "../src/parser.js";
 import { analyzeProject } from "../src/rules/serviceClassifier.js";
 
 describe("Mermaid diagram generation", () => {
-  it("renders internet, reverse proxy, routed service, and dependencies", () => {
+  it("renders Compose visibility groups and dependencies without internet reachability claims", () => {
     const project = parseComposeContent(`
 services:
   traefik:
@@ -24,8 +24,9 @@ services:
     const report = analyzeProject(project);
 
     expect(report.mermaid).toContain("graph TD");
-    expect(report.mermaid).toContain("Internet --> svc_traefik");
-    expect(report.mermaid).toContain("svc_traefik --> svc_web");
+    expect(report.mermaid).toContain("Published --> svc_traefik");
+    expect(report.mermaid).toContain("Unknown -.-> svc_web");
     expect(report.mermaid).toContain("svc_web --> svc_db");
+    expect(report.mermaid).not.toContain("Internet");
   });
 });

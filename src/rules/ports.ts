@@ -34,12 +34,16 @@ export function isLocalhostBinding(hostIp: string | undefined): boolean {
 
 function parseShortPort(raw: string): PortMapping | null {
   const trimmed = raw.trim();
-  if (!trimmed) {
+  if (!trimmed || hasInterpolation(trimmed)) {
     return null;
   }
 
   const [withoutProtocol, protocol] = splitProtocol(trimmed);
   const parts = withoutProtocol.split(":");
+
+  if (parts.some((part) => part.trim().length === 0)) {
+    return null;
+  }
 
   if (parts.length === 1) {
     return buildPortMapping({
@@ -83,7 +87,7 @@ function parseLongPort(raw: Record<string, unknown>): PortMapping | null {
   const hostIp = typeof raw.host_ip === "string" ? raw.host_ip : undefined;
   const protocol = typeof raw.protocol === "string" ? raw.protocol : undefined;
 
-  if (!target && !published) {
+  if ((!target && !published) || hasInterpolation(target) || hasInterpolation(published) || hasInterpolation(hostIp)) {
     return null;
   }
 
@@ -97,6 +101,10 @@ function parseLongPort(raw: Record<string, unknown>): PortMapping | null {
     protocol,
     isPublished: true
   });
+}
+
+function hasInterpolation(value: string | undefined): boolean {
+  return Boolean(value?.includes("$"));
 }
 
 function buildPortMapping(input: Omit<PortMapping, "isLocalhostBound" | "isBroadlyBound">): PortMapping {
