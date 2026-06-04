@@ -186,6 +186,7 @@ Useful issues include parser edge cases, incorrect `published` / `internal` / `u
 
 See [docs/community.md](docs/community.md) for issue and contribution guidance.
 See [docs/rules.md](docs/rules.md) for rule details and known limits.
+See [docs/tailscale-checklist.md](docs/tailscale-checklist.md) for reviewing Compose findings alongside Tailscale ACLs, MagicDNS, subnet routes, and host firewall rules.
 
 ## Current Limitations
 

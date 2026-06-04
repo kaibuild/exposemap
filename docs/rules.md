@@ -199,3 +199,5 @@ Useful issues include:
 - sanitized Compose examples that ExposeMap should handle better
 
 Do not paste private Compose files, `.env` files, credentials, private domains, internal hostnames, customer names, or sensitive infrastructure details into public issues.
+
+If your stack is intended to be reachable only through Tailscale, also review [tailscale-checklist.md](tailscale-checklist.md). ExposeMap does not verify Tailscale ACLs, MagicDNS, subnet routes, device state, or live access.
