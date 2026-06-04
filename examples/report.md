@@ -144,18 +144,34 @@ No host-published Compose ports were detected. This is not proof that the servic
 
 ```mermaid
 graph TD
-  Published[Host-published in Compose]
-  Internal[No host-published ports found]
-  Unknown[Unknown from Compose]
-  Published --> svc_traefik[traefik]
-  Published --> svc_postgres[postgres]
-  Published --> svc_redis[redis]
-  Published --> svc_admin[admin]
-  Internal --> svc_worker[worker]
-  Unknown -.-> svc_web[web]
-  svc_web --> svc_postgres[postgres]
-  svc_web --> svc_redis[redis]
-  svc_worker --> svc_redis[redis]
+  classDef published fill:#fee2e2,stroke:#b91c1c,color:#111827;
+  classDef local fill:#fef3c7,stroke:#b45309,color:#111827;
+  classDef proxy fill:#e0f2fe,stroke:#0369a1,color:#111827;
+  classDef internal fill:#dcfce7,stroke:#15803d,color:#111827;
+  classDef unknown fill:#ede9fe,stroke:#6d28d9,color:#111827;
+  subgraph group_published["Host-published in Compose"]
+    svc_traefik["traefik"]
+    class svc_traefik published;
+    svc_postgres["postgres"]
+    class svc_postgres published;
+    svc_redis["redis"]
+    class svc_redis published;
+  end
+  subgraph group_local["Localhost-published in Compose"]
+    svc_admin["admin"]
+    class svc_admin local;
+  end
+  subgraph group_proxy["Reverse proxy hints"]
+    svc_web["web"]
+    class svc_web proxy;
+  end
+  subgraph group_internal["No host-published ports found"]
+    svc_worker["worker"]
+    class svc_worker internal;
+  end
+  svc_web -->|depends_on| svc_postgres
+  svc_web -->|depends_on| svc_redis
+  svc_worker -->|depends_on| svc_redis
 ```
 
 ## Limitations
