@@ -51,6 +51,19 @@ The JSON report includes:
 - findings
 - Mermaid diagram string
 
+## HTML Report
+
+Generate a static HTML report you can open in a browser:
+
+```bash
+node dist/cli.js scan ./docker-compose.yml --format html
+```
+The HTML report is static, local, and loads no external scripts.
+Nothing is uploaded anywhere.
+
+- Warning : Reports may contain sensitive service names,
+- Set proper artifact retention rules in your CI.
+
 ## Fail-on Thresholds
 
 `--fail-on` controls whether ExposeMap exits non-zero after a successful scan.
