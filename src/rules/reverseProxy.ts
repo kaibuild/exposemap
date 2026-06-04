@@ -77,7 +77,12 @@ export function isLikelyCloudflareTunnelService(service: ComposeService): boolea
 }
 
 export function hasReverseProxyRoutingHint(service: ComposeService): boolean {
-  return hasTraefikRoutingHint(service.labels) || hasCaddyRoutingHint(service) || hasEnvironmentRoutingHint(service.environment);
+  return (
+    hasTraefikRoutingHint(service.labels) ||
+    hasNginxProxyRoutingHint(service.labels) ||
+    hasCaddyRoutingHint(service) ||
+    hasEnvironmentRoutingHint(service.environment)
+  );
 }
 
 export function hasTraefikRoutingHint(labels: Record<string, string>): boolean {
@@ -91,9 +96,35 @@ export function hasTraefikRoutingHint(labels: Record<string, string>): boolean {
 
     return (
       normalizedKey.startsWith("traefik.http.routers.") ||
+      normalizedKey.startsWith("traefik.tcp.routers.") ||
+      normalizedKey.startsWith("traefik.udp.routers.") ||
       normalizedKey.startsWith("traefik.http.services.") ||
+      normalizedKey.startsWith("traefik.tcp.services.") ||
+      normalizedKey.startsWith("traefik.udp.services.") ||
       normalizedKey.startsWith("traefik.http.middlewares.")
     );
+  });
+}
+
+export function hasNginxProxyRoutingHint(labels: Record<string, string>): boolean {
+  return Object.entries(labels).some(([key, value]) => {
+    const normalizedKey = key.toLowerCase();
+    const normalizedValue = value.toLowerCase();
+    const entry = `${normalizedKey}=${normalizedValue}`;
+
+    if (!hasNonEmptyLabelValue(value)) {
+      return false;
+    }
+
+    if (normalizedKey === "nginx-proxy.virtual_host" || normalizedKey === "nginx_proxy.virtual_host") {
+      return true;
+    }
+
+    if (normalizedKey.startsWith("nginx-proxy.") || normalizedKey.startsWith("nginx_proxy.")) {
+      return normalizedKey.includes("host") || normalizedKey.includes("virtual");
+    }
+
+    return entry.includes("nginx-proxy") && (entry.includes("virtual_host") || entry.includes("host"));
   });
 }
 
@@ -140,6 +171,10 @@ function hasEnvironmentRoutingHint(environment: Record<string, string>): boolean
 function hasNonEmptyEnvironmentValue(environment: Record<string, string>, key: string): boolean {
   const value = environment[key];
   return typeof value === "string" && value.trim().length > 0;
+}
+
+function hasNonEmptyLabelValue(value: string): boolean {
+  return value.trim().length > 0;
 }
 
 function normalizeRawValue(value: unknown): string {

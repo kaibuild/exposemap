@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   hasCaddyConfigHint,
   hasCaddyRoutingHint,
+  hasNginxProxyRoutingHint,
   hasReverseProxyRoutingHint,
   isLikelyCloudflareTunnelService,
   isLikelyCaddyService,
@@ -27,6 +28,48 @@ describe("reverse proxy detection", () => {
         })
       )
     ).toBe(true);
+    expect(
+      hasReverseProxyRoutingHint(
+        service({
+          labels: {
+            "traefik.tcp.routers.postgres.rule": "HostSNI(`db.example.test`)",
+            "traefik.tcp.services.postgres.loadbalancer.server.port": "5432"
+          }
+        })
+      )
+    ).toBe(true);
+    expect(
+      hasReverseProxyRoutingHint(
+        service({
+          labels: {
+            "traefik.udp.routers.dns.service": "dns",
+            "traefik.udp.services.dns.loadbalancer.server.port": "53"
+          }
+        })
+      )
+    ).toBe(true);
+  });
+
+  it("detects nginx-proxy routing labels conservatively", () => {
+    expect(
+      hasNginxProxyRoutingHint({
+        "nginx-proxy.virtual_host": "app.example.test"
+      })
+    ).toBe(true);
+    expect(
+      hasReverseProxyRoutingHint(
+        service({
+          labels: {
+            "nginx_proxy.virtual_host": "app.example.test"
+          }
+        })
+      )
+    ).toBe(true);
+    expect(
+      hasNginxProxyRoutingHint({
+        "nginx-proxy.network": "proxy"
+      })
+    ).toBe(false);
   });
 
   it("detects environment routing hints", () => {

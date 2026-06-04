@@ -108,8 +108,9 @@ ExposeMap detects likely reverse proxy services from service names or images con
 
 ExposeMap also detects routing hints from labels and environment variables, including:
 
-- Traefik router, service, middleware labels
+- Traefik HTTP/TCP/UDP router and service labels
 - `traefik.enable=true`
+- nginx-proxy labels such as `nginx-proxy.virtual_host` or `nginx_proxy.virtual_host`
 - Caddy labels such as `caddy`, `caddy.*`, and `caddy_*`
 - `VIRTUAL_HOST`
 - `LETSENCRYPT_HOST`
@@ -124,6 +125,16 @@ services:
     labels:
       traefik.enable: "true"
       traefik.http.routers.app.rule: Host(`app.example.test`)
+
+  tcpapp:
+    image: example/tcp-app
+    labels:
+      traefik.tcp.routers.tcpapp.rule: HostSNI(`tcp.example.test`)
+
+  nginxproxyapp:
+    image: example/app
+    labels:
+      nginx-proxy.virtual_host: nginxproxyapp.example.test
 ```
 
 Services with routing hints are classified as `unknown` because Compose labels alone do not prove the real proxy route.
