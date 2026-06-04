@@ -125,12 +125,15 @@ Table output is the default:
 node dist/cli.js scan ./docker-compose.yml --format table
 ```
 
-Markdown and JSON are also available:
+Markdown, JSON, and static HTML are also available:
 
 ```bash
 node dist/cli.js scan ./docker-compose.yml --format markdown
 node dist/cli.js scan ./docker-compose.yml --format json
+node dist/cli.js scan ./docker-compose.yml --format html > exposemap-report.html
 ```
+
+The HTML report is static and local. It does not upload data, load external scripts, or create a hosted dashboard.
 
 If you install this repo as a local package, the bin name is:
 
@@ -211,7 +214,6 @@ ExposeMap does not prove real internet exposure. It does not replace a full secu
 ## Roadmap
 
 - Better reverse proxy label support
-- HTML report output
 - Tailscale checklist
 - External scan integration, opt-in only
 - Hosted dashboard
@@ -234,7 +236,7 @@ Issue templates are available for [bug reports](.github/ISSUE_TEMPLATE/bug_repor
 
 ExposeMap is free and open source.
 
-The open-source CLI is the core product: local table output, Markdown reports, JSON output, Docker usage, CI usage, and Mermaid diagrams should remain useful without any paid service.
+The open-source CLI is the core product: local table output, Markdown reports, JSON output, static HTML reports, Docker usage, CI usage, and Mermaid diagrams should remain useful without any paid service.
 
 A hosted dashboard, setup review intake, pricing page, paid support plan, or service promise is not available. Future options may be considered later only if the OSS project shows clear demand.
 

@@ -1,5 +1,6 @@
 import { parseComposeFile } from "./parser.js";
 import { analyzeProject } from "./rules/serviceClassifier.js";
+import { renderHtmlReport } from "./report/html.js";
 import { renderJsonReport } from "./report/json.js";
 import { renderMarkdownReport } from "./report/markdown.js";
 import { renderTableReport } from "./report/table.js";
@@ -20,6 +21,11 @@ export async function scanComposeFileToJson(filePath: string): Promise<string> {
   return renderJsonReport(report);
 }
 
+export async function scanComposeFileToHtml(filePath: string): Promise<string> {
+  const report = await scanComposeFile(filePath);
+  return renderHtmlReport(report);
+}
+
 export async function scanComposeFileToTable(filePath: string): Promise<string> {
   const report = await scanComposeFile(filePath);
   return renderTableReport(report);
@@ -29,6 +35,7 @@ export * from "./types.js";
 export { parseComposeContent, parseComposeFile } from "./parser.js";
 export { analyzeProject, analyzeService } from "./rules/serviceClassifier.js";
 export { parseFailOnThreshold, getExitCodeForReport, violatesFailOnThreshold } from "./failOn.js";
+export { renderHtmlReport } from "./report/html.js";
 export { buildJsonReport, renderJsonReport } from "./report/json.js";
 export { renderMarkdownReport } from "./report/markdown.js";
 export { renderTableReport } from "./report/table.js";
