@@ -31,6 +31,8 @@ services:
       - "127.0.0.1:8080:8080"
   worker:
     image: ghcr.io/example/worker:latest
+  tunnel:
+    image: cloudflare/cloudflared:latest
 `,
         "compose.yml"
       )
@@ -50,13 +52,13 @@ services:
       ])
     );
     expect(json.summary).toMatchObject({
-      totalServices: 5,
+      totalServices: 6,
       internal: 1,
       published: 3,
-      unknown: 1,
-      totalFindings: 2,
+      unknown: 2,
+      totalFindings: 3,
       high: 0,
-      medium: 1,
+      medium: 2,
       low: 1
     });
     expect(json.services.find((service) => service.name === "app")).toMatchObject({
@@ -75,6 +77,11 @@ services:
         evidence: ["5432:5432"]
       })
     );
+    expect(json.services.find((service) => service.name === "tunnel")).toMatchObject({
+      classification: "unknown",
+      why: "cloudflared tunnel detected; routes may live outside Compose",
+      evidence: expect.arrayContaining(["cloudflared tunnel detected; routes may live outside Compose"])
+    });
     expect(json.findings.some((finding) => finding.ruleId === "risky-direct-port")).toBe(false);
     expect(json.mermaid).toContain("graph TD");
   });

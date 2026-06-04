@@ -22,6 +22,21 @@ export function isLikelyReverseProxyService(service: ComposeService): boolean {
   return tokenize(haystack).includes("npm");
 }
 
+export function isLikelyCloudflareTunnelService(service: ComposeService): boolean {
+  const command = normalizeRawValue(service.raw.command);
+  const haystack = `${service.name} ${service.image ?? ""} ${command}`.toLowerCase();
+
+  if (haystack.includes("cloudflared")) {
+    return true;
+  }
+
+  if (haystack.includes("cloudflare") && haystack.includes("tunnel")) {
+    return true;
+  }
+
+  return hasNonEmptyEnvironmentValue(service.environment, "TUNNEL_TOKEN");
+}
+
 export function hasReverseProxyRoutingHint(service: ComposeService): boolean {
   return hasTraefikRoutingHint(service.labels) || hasCaddyLikeHint(service.labels) || hasEnvironmentRoutingHint(service.environment);
 }
@@ -55,6 +70,23 @@ function hasEnvironmentRoutingHint(environment: Record<string, string>): boolean
     const value = environment[key];
     return typeof value === "string" && value.trim().length > 0;
   });
+}
+
+function hasNonEmptyEnvironmentValue(environment: Record<string, string>, key: string): boolean {
+  const value = environment[key];
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function normalizeRawValue(value: unknown): string {
+  if (Array.isArray(value)) {
+    return value.map(String).join(" ");
+  }
+
+  if (typeof value === "string") {
+    return value;
+  }
+
+  return "";
 }
 
 function tokenize(value: string): string[] {

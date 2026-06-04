@@ -25,6 +25,9 @@ services:
     image: api
     expose:
       - "3000"
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    command: tunnel run
   odd:
     image: odd
     ports:
@@ -42,15 +45,19 @@ services:
       app: "unknown",
       worker: "internal",
       api: "internal",
+      tunnel: "unknown",
       odd: "unknown"
     });
 
     const admin = report.services.find((service) => service.service.name === "admin");
     const app = report.services.find((service) => service.service.name === "app");
     const api = report.services.find((service) => service.service.name === "api");
+    const tunnel = report.services.find((service) => service.service.name === "tunnel");
 
     expect(admin?.why).toBe("ports: 127.0.0.1:8080:8080");
     expect(app?.why).toBe("proxy labels detected; note only in MVP");
     expect(api?.why).toBe("expose only: 3000");
+    expect(tunnel?.why).toBe("cloudflared tunnel detected; routes may live outside Compose");
+    expect(tunnel?.notes).toContain("Cloudflare Tunnel routes may exist outside Compose; ExposeMap does not call the Cloudflare API.");
   });
 });

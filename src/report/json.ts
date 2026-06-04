@@ -131,6 +131,10 @@ function buildEvidence(service: ServiceAnalysis): string[] {
     evidence.push("likely reverse proxy service; note only in MVP");
   }
 
+  if (service.isCloudflareTunnel) {
+    evidence.push("cloudflared tunnel detected; routes may live outside Compose");
+  }
+
   if (service.hasReverseProxyRouting) {
     evidence.push("proxy labels detected; note only in MVP");
   }

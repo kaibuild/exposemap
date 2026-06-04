@@ -130,6 +130,28 @@ Services with routing hints are classified as `unknown` because Compose labels a
 
 If ExposeMap finds a likely reverse proxy service but no routed services, it emits a `reverse-proxy-routes-unclear` finding.
 
+## Cloudflare Tunnel Hints
+
+ExposeMap detects likely Cloudflare Tunnel services from local Compose fields such as:
+
+- service names containing `cloudflared`
+- images containing `cloudflared`
+- commands containing `cloudflared tunnel`
+- a non-empty `TUNNEL_TOKEN` environment variable
+
+Example:
+
+```yaml
+services:
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    command: tunnel run
+```
+
+Services with Cloudflare Tunnel hints are classified as `unknown` because tunnel routes may live outside Compose.
+
+ExposeMap does not call the Cloudflare API, inspect tunnel configuration, inspect DNS, inspect Zero Trust settings, or verify live access.
+
 ## Risky Host-Published Ports
 
 ExposeMap emits high-severity findings for host-published Compose ports commonly associated with databases, caches, search backends, or admin panels.

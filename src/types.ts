@@ -53,6 +53,7 @@ export interface ServiceAnalysis {
   broadPorts: PortMapping[];
   localhostPorts: PortMapping[];
   isReverseProxy: boolean;
+  isCloudflareTunnel: boolean;
   hasReverseProxyRouting: boolean;
   why: string;
   findings: Finding[];

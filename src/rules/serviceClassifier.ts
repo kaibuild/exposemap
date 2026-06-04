@@ -9,7 +9,11 @@ import type {
 import { getBroadlyBoundPorts } from "./directExposure.js";
 import { getLocalhostBindings } from "./localhostBindings.js";
 import { parsePortMappings } from "./ports.js";
-import { hasReverseProxyRoutingHint, isLikelyReverseProxyService } from "./reverseProxy.js";
+import {
+  hasReverseProxyRoutingHint,
+  isLikelyCloudflareTunnelService,
+  isLikelyReverseProxyService
+} from "./reverseProxy.js";
 import { renderMermaidDiagram } from "../report/mermaid.js";
 
 export function analyzeProject(project: ComposeProject): ExposureReport {
@@ -32,14 +36,16 @@ export function analyzeService(service: ComposeService): ServiceAnalysis {
   const broadPorts = getBroadlyBoundPorts(ports);
   const localhostPorts = getLocalhostBindings(ports);
   const isReverseProxy = isLikelyReverseProxyService(service);
+  const isCloudflareTunnel = isLikelyCloudflareTunnelService(service);
   const hasReverseProxyRouting = hasReverseProxyRoutingHint(service);
   const classification = classifyService({
     ports,
+    isCloudflareTunnel,
     hasReverseProxyRouting,
     service
   });
-  const why = buildWhy(service, ports, classification, hasReverseProxyRouting);
-  const notes = buildNotes(service, ports, hasReverseProxyRouting);
+  const why = buildWhy(service, ports, classification, isCloudflareTunnel, hasReverseProxyRouting);
+  const notes = buildNotes(service, ports, isCloudflareTunnel, hasReverseProxyRouting);
 
   const findings: Finding[] = buildInformationalFindings(service.name, classification, why);
 
@@ -62,6 +68,7 @@ export function analyzeService(service: ComposeService): ServiceAnalysis {
     broadPorts,
     localhostPorts,
     isReverseProxy,
+    isCloudflareTunnel,
     hasReverseProxyRouting,
     why,
     findings,
@@ -71,6 +78,7 @@ export function analyzeService(service: ComposeService): ServiceAnalysis {
 
 function classifyService(input: {
   ports: ReturnType<typeof parsePortMappings>;
+  isCloudflareTunnel: boolean;
   hasReverseProxyRouting: boolean;
   service: ComposeService;
 }): ExposureClassification {
@@ -86,6 +94,10 @@ function classifyService(input: {
     return "unknown";
   }
 
+  if (input.isCloudflareTunnel) {
+    return "unknown";
+  }
+
   return "internal";
 }
 
@@ -93,6 +105,7 @@ function buildWhy(
   service: ComposeService,
   ports: ReturnType<typeof parsePortMappings>,
   classification: ExposureClassification,
+  isCloudflareTunnel: boolean,
   hasReverseProxyRouting: boolean
 ): string {
   if (classification === "published") {
@@ -106,6 +119,10 @@ function buildWhy(
 
     if (hasReverseProxyRouting) {
       return "proxy labels detected; note only in MVP";
+    }
+
+    if (isCloudflareTunnel) {
+      return "cloudflared tunnel detected; routes may live outside Compose";
     }
 
     return "unsupported compose syntax";
@@ -133,6 +150,7 @@ function hasServiceNetworks(value: unknown): boolean {
 function buildNotes(
   service: ComposeService,
   ports: ReturnType<typeof parsePortMappings>,
+  isCloudflareTunnel: boolean,
   hasReverseProxyRouting: boolean
 ): string[] {
   const notes: string[] = [];
@@ -143,6 +161,10 @@ function buildNotes(
 
   if (hasReverseProxyRouting) {
     notes.push("Reverse proxy labels are note only in MVP and are not a formal classification.");
+  }
+
+  if (isCloudflareTunnel) {
+    notes.push("Cloudflare Tunnel routes may exist outside Compose; ExposeMap does not call the Cloudflare API.");
   }
 
   if (service.ports.length > 0 && ports.length !== service.ports.length) {

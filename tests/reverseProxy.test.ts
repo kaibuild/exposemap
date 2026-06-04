@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { hasReverseProxyRoutingHint, isLikelyReverseProxyService } from "../src/rules/reverseProxy.js";
+import {
+  hasReverseProxyRoutingHint,
+  isLikelyCloudflareTunnelService,
+  isLikelyReverseProxyService
+} from "../src/rules/reverseProxy.js";
 import type { ComposeService } from "../src/types.js";
 
 describe("reverse proxy detection", () => {
@@ -31,6 +35,31 @@ describe("reverse proxy detection", () => {
         })
       )
     ).toBe(true);
+  });
+
+  it("detects likely Cloudflare Tunnel services without calling external APIs", () => {
+    expect(isLikelyCloudflareTunnelService(service({ name: "cloudflared", image: "cloudflare/cloudflared:latest" }))).toBe(true);
+    expect(
+      isLikelyCloudflareTunnelService(
+        service({
+          name: "tunnel",
+          image: "example/runner",
+          raw: {
+            command: ["cloudflared", "tunnel", "run"]
+          }
+        })
+      )
+    ).toBe(true);
+    expect(
+      isLikelyCloudflareTunnelService(
+        service({
+          environment: {
+            TUNNEL_TOKEN: "placeholder"
+          }
+        })
+      )
+    ).toBe(true);
+    expect(isLikelyCloudflareTunnelService(service({ name: "worker", image: "example/worker" }))).toBe(false);
   });
 });
 

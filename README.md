@@ -58,6 +58,7 @@ ExposeMap makes that first-pass map visible without uploading the Compose file a
 - `services.*.expose`
 - `services.*.networks`
 - Optional labels as note-only context
+- Likely `cloudflared` services as note-only context
 
 ## What It Does Not Check
 
@@ -105,6 +106,7 @@ Examples:
 - variable interpolation that needs expanded Compose config
 - profiles, extends, include, anchors, or merge keys that need expanded Compose config
 - reverse proxy labels, which are note-only in the MVP
+- Cloudflare Tunnel services, where routes may live outside Compose
 
 ## Quick Start
 
@@ -207,7 +209,6 @@ ExposeMap does not prove real internet exposure. It does not replace a full secu
 - HTML report output
 - Caddy config support
 - Nginx Proxy Manager support
-- Cloudflare Tunnel hints
 - Tailscale checklist
 - External scan integration, opt-in only
 - Hosted dashboard
