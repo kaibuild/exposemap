@@ -1,4 +1,4 @@
-# Show HN: ExposeMap - open-source exposure mapper for Docker Compose services
+# Show HN: ExposeMap - local Docker Compose host-published service mapper
 
 GitHub: https://github.com/kaibuild/exposemap
 
@@ -6,18 +6,16 @@ I built ExposeMap, a small open-source CLI for self-hosters who run services wit
 
 It scans a `docker-compose.yml` file and classifies services as:
 
+- published
 - internal
-- localhost-only
-- directly exposed
-- reverse-proxy exposed
 - unknown
 
-It also generates a Markdown report and a Mermaid diagram so you can review the likely exposure paths in a Compose stack.
+It also generates Markdown and JSON reports so you can review which services look host-published from a Compose file.
 
-The goal is not to prove real internet exposure. It does not perform network scans, connect to containers, or send files anywhere. It is a local configuration review tool based on Compose heuristics.
+The goal is not to prove real internet exposure. `published` means host-published in Compose, not internet-reachable. It does not perform network scans, connect to containers, inspect secrets, or send files anywhere. It is a local configuration review tool based on Compose heuristics.
 
-The MVP currently handles common port mappings, localhost bindings, Traefik-style labels, likely reverse proxy services, and risky directly exposed database/admin ports.
+The MVP currently handles common port mappings, localhost bindings, long syntax `ports`, `expose`, basic network context, and reverse proxy labels as note-only context.
 
-Longer term, scheduled checks, history, diffs, and alerts may be worth exploring, but the current project is just the free local CLI.
+Longer term, better reverse proxy support, HTML reports, scheduled checks, history, diffs, and alerts may be worth exploring, but the current project is just the free local CLI.
 
 Feedback, edge cases, and sanitized Compose examples are welcome.
