@@ -185,6 +185,7 @@ Please do not paste private Compose files, `.env` files, credentials, tokens, pr
 Useful issues include parser edge cases, incorrect `published` / `internal` / `unknown` classifications, unclear report wording, Docker usage problems, CI usage problems, and sanitized Compose examples that ExposeMap should handle better.
 
 See [docs/community.md](docs/community.md) for issue and contribution guidance.
+See [docs/rules.md](docs/rules.md) for rule details and known limits.
 
 ## Current Limitations
 
