@@ -213,8 +213,8 @@ ExposeMap does not prove real internet exposure. It does not replace a full secu
 
 ## Roadmap
 
-- Better reverse proxy label support
-- Tailscale checklist
+- More sanitized Compose examples
+- Broader reverse proxy configuration examples
 - External scan integration, opt-in only
 - Hosted dashboard
 
