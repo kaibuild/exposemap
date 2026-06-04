@@ -130,6 +130,30 @@ Services with routing hints are classified as `unknown` because Compose labels a
 
 If ExposeMap finds a likely reverse proxy service but no routed services, it emits a `reverse-proxy-routes-unclear` finding.
 
+## Nginx Proxy Manager Hints
+
+ExposeMap detects likely Nginx Proxy Manager services from local Compose fields such as:
+
+- service names such as `npm` or `nginx-proxy-manager`
+- images such as `jc21/nginx-proxy-manager`
+- names, images, or commands containing `nginx proxy manager`
+
+Example:
+
+```yaml
+services:
+  npm:
+    image: jc21/nginx-proxy-manager:latest
+    ports:
+      - "80:80"
+      - "443:443"
+      - "81:81"
+```
+
+Nginx Proxy Manager route state often lives in its app database or mounted runtime configuration, not directly in Compose.
+
+ExposeMap does not inspect Nginx Proxy Manager state, read its database, guess domains, infer proxy hosts, inspect DNS, or verify live access. The presence of an NPM service does not cause ExposeMap to mark other services as routed.
+
 ## Caddy Hints
 
 ExposeMap detects likely Caddy services and Caddy routing hints from local Compose fields such as:
@@ -229,6 +253,7 @@ ExposeMap does not:
 - inspect secrets
 - verify firewall rules
 - parse Caddyfile contents
+- inspect Nginx Proxy Manager state
 - verify DNS, VPNs, tunnels, or cloud security groups
 - prove internet reachability
 - replace a security audit

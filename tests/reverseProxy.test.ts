@@ -5,6 +5,7 @@ import {
   hasReverseProxyRoutingHint,
   isLikelyCloudflareTunnelService,
   isLikelyCaddyService,
+  isLikelyNginxProxyManagerService,
   isLikelyReverseProxyService
 } from "../src/rules/reverseProxy.js";
 import type { ComposeService } from "../src/types.js";
@@ -92,6 +93,23 @@ describe("reverse proxy detection", () => {
         })
       )
     ).toBe(true);
+  });
+
+  it("detects likely Nginx Proxy Manager services without guessing routes", () => {
+    expect(isLikelyNginxProxyManagerService(service({ name: "npm", image: "jc21/nginx-proxy-manager:latest" }))).toBe(true);
+    expect(isLikelyNginxProxyManagerService(service({ name: "nginx-proxy-manager", image: "example/proxy" }))).toBe(true);
+    expect(isLikelyReverseProxyService(service({ name: "npm", image: "jc21/nginx-proxy-manager:latest" }))).toBe(true);
+    expect(
+      isLikelyNginxProxyManagerService(
+        service({
+          name: "app",
+          image: "node:20",
+          raw: {
+            command: "npm start"
+          }
+        })
+      )
+    ).toBe(false);
   });
 
   it("detects likely Cloudflare Tunnel services without calling external APIs", () => {

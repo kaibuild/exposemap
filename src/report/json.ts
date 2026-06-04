@@ -139,6 +139,10 @@ function buildEvidence(service: ServiceAnalysis): string[] {
     evidence.push("likely Caddy service detected");
   }
 
+  if (service.isNginxProxyManagerService) {
+    evidence.push("likely Nginx Proxy Manager service detected; routes may live outside Compose");
+  }
+
   if (service.hasCaddyConfigHint) {
     evidence.push("Caddyfile or /etc/caddy mount detected; Caddyfile contents are not parsed");
   }

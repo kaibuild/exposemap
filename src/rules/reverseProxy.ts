@@ -20,7 +20,7 @@ export function isLikelyReverseProxyService(service: ComposeService): boolean {
     return true;
   }
 
-  return tokenize(haystack).includes("npm") || hasCaddyConfigHint(service);
+  return isLikelyNginxProxyManagerService(service) || hasCaddyConfigHint(service);
 }
 
 export function isLikelyCaddyService(service: ComposeService): boolean {
@@ -32,6 +32,33 @@ export function isLikelyCaddyService(service: ComposeService): boolean {
   }
 
   return hasCaddyConfigHint(service);
+}
+
+export function isLikelyNginxProxyManagerService(service: ComposeService): boolean {
+  const command = normalizeRawValue(service.raw.command);
+  const name = service.name.toLowerCase();
+  const image = (service.image ?? "").toLowerCase();
+  const haystack = `${name} ${image} ${command}`.toLowerCase();
+  const nameTokens = tokenize(name);
+  const haystackTokens = tokenize(haystack);
+
+  if (
+    haystack.includes("nginx-proxy-manager") ||
+    haystack.includes("nginx proxy manager") ||
+    haystack.includes("nginxproxymanager")
+  ) {
+    return true;
+  }
+
+  if (image.includes("jc21/nginx-proxy-manager")) {
+    return true;
+  }
+
+  if (nameTokens.includes("npm")) {
+    return true;
+  }
+
+  return haystackTokens.includes("nginx") && haystackTokens.includes("proxy") && haystackTokens.includes("manager");
 }
 
 export function isLikelyCloudflareTunnelService(service: ComposeService): boolean {

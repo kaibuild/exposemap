@@ -15,6 +15,7 @@ import {
   hasReverseProxyRoutingHint,
   isLikelyCloudflareTunnelService,
   isLikelyCaddyService,
+  isLikelyNginxProxyManagerService,
   isLikelyReverseProxyService
 } from "./reverseProxy.js";
 import { renderMermaidDiagram } from "../report/mermaid.js";
@@ -41,6 +42,7 @@ export function analyzeService(service: ComposeService): ServiceAnalysis {
   const isReverseProxy = isLikelyReverseProxyService(service);
   const isCloudflareTunnel = isLikelyCloudflareTunnelService(service);
   const isCaddyService = isLikelyCaddyService(service);
+  const isNginxProxyManagerService = isLikelyNginxProxyManagerService(service);
   const caddyConfigHint = hasCaddyConfigHint(service);
   const caddyRoutingHint = hasCaddyRoutingHint(service);
   const hasReverseProxyRouting = hasReverseProxyRoutingHint(service);
@@ -51,7 +53,16 @@ export function analyzeService(service: ComposeService): ServiceAnalysis {
     service
   });
   const why = buildWhy(service, ports, classification, isCloudflareTunnel, caddyRoutingHint, hasReverseProxyRouting);
-  const notes = buildNotes(service, ports, isCloudflareTunnel, isCaddyService, caddyConfigHint, caddyRoutingHint, hasReverseProxyRouting);
+  const notes = buildNotes(
+    service,
+    ports,
+    isCloudflareTunnel,
+    isCaddyService,
+    isNginxProxyManagerService,
+    caddyConfigHint,
+    caddyRoutingHint,
+    hasReverseProxyRouting
+  );
 
   const findings: Finding[] = buildInformationalFindings(service.name, classification, why);
 
@@ -76,6 +87,7 @@ export function analyzeService(service: ComposeService): ServiceAnalysis {
     isReverseProxy,
     isCloudflareTunnel,
     isCaddyService,
+    isNginxProxyManagerService,
     hasCaddyConfigHint: caddyConfigHint,
     hasCaddyRoutingHint: caddyRoutingHint,
     hasReverseProxyRouting,
@@ -166,6 +178,7 @@ function buildNotes(
   ports: ReturnType<typeof parsePortMappings>,
   isCloudflareTunnel: boolean,
   isCaddyService: boolean,
+  isNginxProxyManagerService: boolean,
   hasCaddyConfig: boolean,
   hasCaddyRouting: boolean,
   hasReverseProxyRouting: boolean
@@ -182,6 +195,10 @@ function buildNotes(
 
   if (isCaddyService || hasCaddyConfig) {
     notes.push("Caddy routes may live in mounted Caddyfiles; ExposeMap does not parse Caddyfile contents.");
+  }
+
+  if (isNginxProxyManagerService) {
+    notes.push("Nginx Proxy Manager routes may live in its app database or config; ExposeMap does not inspect NPM state or guess domains.");
   }
 
   if (hasCaddyRouting) {

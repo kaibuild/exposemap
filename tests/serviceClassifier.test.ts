@@ -37,6 +37,12 @@ services:
     labels:
       caddy: caddyapp.example.test
       caddy.reverse_proxy: "{{upstreams 3000}}"
+  npm:
+    image: jc21/nginx-proxy-manager:latest
+    ports:
+      - "80:80"
+      - "443:443"
+      - "81:81"
   odd:
     image: odd
     ports:
@@ -57,6 +63,7 @@ services:
       tunnel: "unknown",
       caddy: "internal",
       caddyapp: "unknown",
+      npm: "published",
       odd: "unknown"
     });
 
@@ -66,6 +73,7 @@ services:
     const tunnel = report.services.find((service) => service.service.name === "tunnel");
     const caddy = report.services.find((service) => service.service.name === "caddy");
     const caddyapp = report.services.find((service) => service.service.name === "caddyapp");
+    const npm = report.services.find((service) => service.service.name === "npm");
 
     expect(admin?.why).toBe("ports: 127.0.0.1:8080:8080");
     expect(app?.why).toBe("proxy labels detected; note only in MVP");
@@ -77,5 +85,7 @@ services:
     expect(caddy?.notes).toContain("Caddy routes may live in mounted Caddyfiles; ExposeMap does not parse Caddyfile contents.");
     expect(caddyapp?.why).toBe("Caddy routing hint detected; routes may live outside Compose");
     expect(caddyapp?.notes).toContain("Caddy labels and CADDY_HOST are hints only in MVP; verify the generated Caddy configuration manually.");
+    expect(npm?.isNginxProxyManagerService).toBe(true);
+    expect(npm?.notes).toContain("Nginx Proxy Manager routes may live in its app database or config; ExposeMap does not inspect NPM state or guess domains.");
   });
 });

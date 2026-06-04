@@ -55,6 +55,7 @@ export interface ServiceAnalysis {
   isReverseProxy: boolean;
   isCloudflareTunnel: boolean;
   isCaddyService: boolean;
+  isNginxProxyManagerService: boolean;
   hasCaddyConfigHint: boolean;
   hasCaddyRoutingHint: boolean;
   hasReverseProxyRouting: boolean;

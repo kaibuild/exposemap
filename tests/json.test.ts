@@ -37,6 +37,12 @@ services:
     image: caddy:2
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
+  npm:
+    image: jc21/nginx-proxy-manager:latest
+    ports:
+      - "80:80"
+      - "443:443"
+      - "81:81"
 `,
         "compose.yml"
       )
@@ -56,9 +62,9 @@ services:
       ])
     );
     expect(json.summary).toMatchObject({
-      totalServices: 7,
+      totalServices: 8,
       internal: 2,
-      published: 3,
+      published: 4,
       unknown: 2,
       totalFindings: 4,
       high: 0,
@@ -93,6 +99,13 @@ services:
         "Caddyfile or /etc/caddy mount detected; Caddyfile contents are not parsed"
       ]),
       notes: expect.arrayContaining(["Caddy routes may live in mounted Caddyfiles; ExposeMap does not parse Caddyfile contents."])
+    });
+    expect(json.services.find((service) => service.name === "npm")).toMatchObject({
+      classification: "published",
+      evidence: expect.arrayContaining(["likely Nginx Proxy Manager service detected; routes may live outside Compose"]),
+      notes: expect.arrayContaining([
+        "Nginx Proxy Manager routes may live in its app database or config; ExposeMap does not inspect NPM state or guess domains."
+      ])
     });
     expect(json.findings.some((finding) => finding.ruleId === "risky-direct-port")).toBe(false);
     expect(json.mermaid).toContain("graph TD");
