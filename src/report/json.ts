@@ -135,6 +135,18 @@ function buildEvidence(service: ServiceAnalysis): string[] {
     evidence.push("cloudflared tunnel detected; routes may live outside Compose");
   }
 
+  if (service.isCaddyService) {
+    evidence.push("likely Caddy service detected");
+  }
+
+  if (service.hasCaddyConfigHint) {
+    evidence.push("Caddyfile or /etc/caddy mount detected; Caddyfile contents are not parsed");
+  }
+
+  if (service.hasCaddyRoutingHint) {
+    evidence.push("Caddy routing hint detected; routes may live outside Compose");
+  }
+
   if (service.hasReverseProxyRouting) {
     evidence.push("proxy labels detected; note only in MVP");
   }

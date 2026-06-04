@@ -110,7 +110,7 @@ ExposeMap also detects routing hints from labels and environment variables, incl
 
 - Traefik router, service, middleware labels
 - `traefik.enable=true`
-- Caddy-like labels containing `caddy` with `host` or `reverse_proxy`
+- Caddy labels such as `caddy`, `caddy.*`, and `caddy_*`
 - `VIRTUAL_HOST`
 - `LETSENCRYPT_HOST`
 - `CADDY_HOST`
@@ -129,6 +129,37 @@ services:
 Services with routing hints are classified as `unknown` because Compose labels alone do not prove the real proxy route.
 
 If ExposeMap finds a likely reverse proxy service but no routed services, it emits a `reverse-proxy-routes-unclear` finding.
+
+## Caddy Hints
+
+ExposeMap detects likely Caddy services and Caddy routing hints from local Compose fields such as:
+
+- service names containing `caddy`
+- images containing `caddy`
+- commands containing `caddy`
+- labels such as `caddy`, `caddy.*`, or `caddy_*`
+- a non-empty `CADDY_HOST` environment variable
+- mounted paths containing `Caddyfile` or `/etc/caddy`
+
+Example:
+
+```yaml
+services:
+  caddy:
+    image: caddy:2
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+
+  app:
+    image: example/app
+    labels:
+      caddy: app.example.test
+      caddy.reverse_proxy: "{{upstreams 3000}}"
+```
+
+Services with Caddy routing hints are classified as `unknown` because Compose labels alone do not prove the real proxy route.
+
+Likely Caddy services with mounted Caddyfiles get note-only evidence. ExposeMap does not parse Caddyfile contents, inspect generated Caddy config, inspect DNS, or verify live access.
 
 ## Cloudflare Tunnel Hints
 
@@ -197,6 +228,7 @@ ExposeMap does not:
 - connect to containers
 - inspect secrets
 - verify firewall rules
+- parse Caddyfile contents
 - verify DNS, VPNs, tunnels, or cloud security groups
 - prove internet reachability
 - replace a security audit

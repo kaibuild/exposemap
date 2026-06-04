@@ -58,6 +58,7 @@ ExposeMap makes that first-pass map visible without uploading the Compose file a
 - `services.*.expose`
 - `services.*.networks`
 - Optional labels as note-only context
+- Caddy service, label, and mounted Caddyfile hints as note-only context
 - Likely `cloudflared` services as note-only context
 
 ## What It Does Not Check
@@ -106,6 +107,7 @@ Examples:
 - variable interpolation that needs expanded Compose config
 - profiles, extends, include, anchors, or merge keys that need expanded Compose config
 - reverse proxy labels, which are note-only in the MVP
+- Caddy labels or mounted Caddyfiles, where routes may live outside Compose
 - Cloudflare Tunnel services, where routes may live outside Compose
 
 ## Quick Start
@@ -197,6 +199,7 @@ See [docs/tailscale-checklist.md](docs/tailscale-checklist.md) for reviewing Com
 - No Cloudflare Tunnel API integration
 - No Tailscale API integration
 - No hosted dashboard
+- No Caddyfile parsing
 - Results are heuristic checks based on Docker Compose configuration
 - Profiles, extends, include, anchors, merge keys, and variable interpolation may need expanded Compose config for safer review
 - Reverse proxy, firewall, VPN, DNS, cloud security group, and host-level rules can change real exposure
@@ -207,7 +210,6 @@ ExposeMap does not prove real internet exposure. It does not replace a full secu
 
 - Better reverse proxy label support
 - HTML report output
-- Caddy config support
 - Nginx Proxy Manager support
 - Tailscale checklist
 - External scan integration, opt-in only

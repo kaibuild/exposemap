@@ -54,6 +54,9 @@ export interface ServiceAnalysis {
   localhostPorts: PortMapping[];
   isReverseProxy: boolean;
   isCloudflareTunnel: boolean;
+  isCaddyService: boolean;
+  hasCaddyConfigHint: boolean;
+  hasCaddyRoutingHint: boolean;
   hasReverseProxyRouting: boolean;
   why: string;
   findings: Finding[];

@@ -10,8 +10,11 @@ import { getBroadlyBoundPorts } from "./directExposure.js";
 import { getLocalhostBindings } from "./localhostBindings.js";
 import { parsePortMappings } from "./ports.js";
 import {
+  hasCaddyConfigHint,
+  hasCaddyRoutingHint,
   hasReverseProxyRoutingHint,
   isLikelyCloudflareTunnelService,
+  isLikelyCaddyService,
   isLikelyReverseProxyService
 } from "./reverseProxy.js";
 import { renderMermaidDiagram } from "../report/mermaid.js";
@@ -37,6 +40,9 @@ export function analyzeService(service: ComposeService): ServiceAnalysis {
   const localhostPorts = getLocalhostBindings(ports);
   const isReverseProxy = isLikelyReverseProxyService(service);
   const isCloudflareTunnel = isLikelyCloudflareTunnelService(service);
+  const isCaddyService = isLikelyCaddyService(service);
+  const caddyConfigHint = hasCaddyConfigHint(service);
+  const caddyRoutingHint = hasCaddyRoutingHint(service);
   const hasReverseProxyRouting = hasReverseProxyRoutingHint(service);
   const classification = classifyService({
     ports,
@@ -44,8 +50,8 @@ export function analyzeService(service: ComposeService): ServiceAnalysis {
     hasReverseProxyRouting,
     service
   });
-  const why = buildWhy(service, ports, classification, isCloudflareTunnel, hasReverseProxyRouting);
-  const notes = buildNotes(service, ports, isCloudflareTunnel, hasReverseProxyRouting);
+  const why = buildWhy(service, ports, classification, isCloudflareTunnel, caddyRoutingHint, hasReverseProxyRouting);
+  const notes = buildNotes(service, ports, isCloudflareTunnel, isCaddyService, caddyConfigHint, caddyRoutingHint, hasReverseProxyRouting);
 
   const findings: Finding[] = buildInformationalFindings(service.name, classification, why);
 
@@ -69,6 +75,9 @@ export function analyzeService(service: ComposeService): ServiceAnalysis {
     localhostPorts,
     isReverseProxy,
     isCloudflareTunnel,
+    isCaddyService,
+    hasCaddyConfigHint: caddyConfigHint,
+    hasCaddyRoutingHint: caddyRoutingHint,
     hasReverseProxyRouting,
     why,
     findings,
@@ -106,6 +115,7 @@ function buildWhy(
   ports: ReturnType<typeof parsePortMappings>,
   classification: ExposureClassification,
   isCloudflareTunnel: boolean,
+  hasCaddyRouting: boolean,
   hasReverseProxyRouting: boolean
 ): string {
   if (classification === "published") {
@@ -115,6 +125,10 @@ function buildWhy(
   if (classification === "unknown") {
     if (service.ports.length > 0 && ports.length !== service.ports.length) {
       return "requires expanded compose config";
+    }
+
+    if (hasCaddyRouting) {
+      return "Caddy routing hint detected; routes may live outside Compose";
     }
 
     if (hasReverseProxyRouting) {
@@ -151,6 +165,9 @@ function buildNotes(
   service: ComposeService,
   ports: ReturnType<typeof parsePortMappings>,
   isCloudflareTunnel: boolean,
+  isCaddyService: boolean,
+  hasCaddyConfig: boolean,
+  hasCaddyRouting: boolean,
   hasReverseProxyRouting: boolean
 ): string[] {
   const notes: string[] = [];
@@ -161,6 +178,14 @@ function buildNotes(
 
   if (hasReverseProxyRouting) {
     notes.push("Reverse proxy labels are note only in MVP and are not a formal classification.");
+  }
+
+  if (isCaddyService || hasCaddyConfig) {
+    notes.push("Caddy routes may live in mounted Caddyfiles; ExposeMap does not parse Caddyfile contents.");
+  }
+
+  if (hasCaddyRouting) {
+    notes.push("Caddy labels and CADDY_HOST are hints only in MVP; verify the generated Caddy configuration manually.");
   }
 
   if (isCloudflareTunnel) {

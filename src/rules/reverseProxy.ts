@@ -13,13 +13,25 @@ const REVERSE_PROXY_KEYWORDS = [
 const ROUTING_ENV_HINTS = ["VIRTUAL_HOST", "LETSENCRYPT_HOST", "CADDY_HOST"];
 
 export function isLikelyReverseProxyService(service: ComposeService): boolean {
-  const haystack = `${service.name} ${service.image ?? ""}`.toLowerCase();
+  const command = normalizeRawValue(service.raw.command);
+  const haystack = `${service.name} ${service.image ?? ""} ${command}`.toLowerCase();
 
   if (REVERSE_PROXY_KEYWORDS.some((keyword) => haystack.includes(keyword))) {
     return true;
   }
 
-  return tokenize(haystack).includes("npm");
+  return tokenize(haystack).includes("npm") || hasCaddyConfigHint(service);
+}
+
+export function isLikelyCaddyService(service: ComposeService): boolean {
+  const command = normalizeRawValue(service.raw.command);
+  const haystack = `${service.name} ${service.image ?? ""} ${command}`.toLowerCase();
+
+  if (tokenize(haystack).includes("caddy")) {
+    return true;
+  }
+
+  return hasCaddyConfigHint(service);
 }
 
 export function isLikelyCloudflareTunnelService(service: ComposeService): boolean {
@@ -38,7 +50,7 @@ export function isLikelyCloudflareTunnelService(service: ComposeService): boolea
 }
 
 export function hasReverseProxyRoutingHint(service: ComposeService): boolean {
-  return hasTraefikRoutingHint(service.labels) || hasCaddyLikeHint(service.labels) || hasEnvironmentRoutingHint(service.environment);
+  return hasTraefikRoutingHint(service.labels) || hasCaddyRoutingHint(service) || hasEnvironmentRoutingHint(service.environment);
 }
 
 export function hasTraefikRoutingHint(labels: Record<string, string>): boolean {
@@ -58,10 +70,36 @@ export function hasTraefikRoutingHint(labels: Record<string, string>): boolean {
   });
 }
 
-function hasCaddyLikeHint(labels: Record<string, string>): boolean {
-  return Object.entries(labels).some(([key, value]) => {
-    const entry = `${key}=${value}`.toLowerCase();
+export function hasCaddyRoutingHint(service: ComposeService): boolean {
+  if (hasNonEmptyEnvironmentValue(service.environment, "CADDY_HOST")) {
+    return true;
+  }
+
+  return Object.entries(service.labels).some(([key, value]) => {
+    const normalizedKey = key.toLowerCase();
+    const normalizedValue = value.toLowerCase();
+    const entry = `${normalizedKey}=${normalizedValue}`;
+
+    if (normalizedKey === "caddy" && normalizedValue.trim().length > 0) {
+      return true;
+    }
+
+    if (normalizedKey.startsWith("caddy.")) {
+      return true;
+    }
+
+    if (normalizedKey.startsWith("caddy_")) {
+      return true;
+    }
+
     return entry.includes("caddy") && (entry.includes("host") || entry.includes("reverse_proxy"));
+  });
+}
+
+export function hasCaddyConfigHint(service: ComposeService): boolean {
+  return normalizeRawList(service.raw.volumes).some((volume) => {
+    const normalized = volume.toLowerCase();
+    return normalized.includes("caddyfile") || normalized.includes("/etc/caddy");
   });
 }
 
@@ -87,6 +125,18 @@ function normalizeRawValue(value: unknown): string {
   }
 
   return "";
+}
+
+function normalizeRawList(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.map(String);
+  }
+
+  if (typeof value === "string") {
+    return [value];
+  }
+
+  return [];
 }
 
 function tokenize(value: string): string[] {

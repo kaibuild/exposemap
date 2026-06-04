@@ -33,6 +33,10 @@ services:
     image: ghcr.io/example/worker:latest
   tunnel:
     image: cloudflare/cloudflared:latest
+  caddy:
+    image: caddy:2
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
 `,
         "compose.yml"
       )
@@ -52,14 +56,14 @@ services:
       ])
     );
     expect(json.summary).toMatchObject({
-      totalServices: 6,
-      internal: 1,
+      totalServices: 7,
+      internal: 2,
       published: 3,
       unknown: 2,
-      totalFindings: 3,
+      totalFindings: 4,
       high: 0,
       medium: 2,
-      low: 1
+      low: 2
     });
     expect(json.services.find((service) => service.name === "app")).toMatchObject({
       classification: "unknown",
@@ -81,6 +85,14 @@ services:
       classification: "unknown",
       why: "cloudflared tunnel detected; routes may live outside Compose",
       evidence: expect.arrayContaining(["cloudflared tunnel detected; routes may live outside Compose"])
+    });
+    expect(json.services.find((service) => service.name === "caddy")).toMatchObject({
+      classification: "internal",
+      evidence: expect.arrayContaining([
+        "likely Caddy service detected",
+        "Caddyfile or /etc/caddy mount detected; Caddyfile contents are not parsed"
+      ]),
+      notes: expect.arrayContaining(["Caddy routes may live in mounted Caddyfiles; ExposeMap does not parse Caddyfile contents."])
     });
     expect(json.findings.some((finding) => finding.ruleId === "risky-direct-port")).toBe(false);
     expect(json.mermaid).toContain("graph TD");
