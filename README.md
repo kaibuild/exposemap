@@ -166,6 +166,17 @@ See [docs/ci-usage.md](docs/ci-usage.md) for local, Docker, JSON, and `--fail-on
 
 See [examples/report.md](examples/report.md) for a generated sample.
 
+### Mermaid Legend
+
+When you view the Mermaid report:
+
+- `published` groups services with host-published Compose ports.
+- `internal` groups services with no detected host-published ports.
+- `unknown` groups services that need manual review because Compose alone is not enough.
+- Reverse proxy or tunnel hints are context only. They do not prove live routes.
+
+The diagram is a Docker Compose configuration view, not a live network map.
+
 ## FAQ
 
 ### Does ExposeMap prove that a service is reachable from the internet?
