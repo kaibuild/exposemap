@@ -162,6 +162,16 @@ ExposeMap can run in CI as a lightweight Compose configuration review step. It r
 
 See [docs/ci-usage.md](docs/ci-usage.md) for local, Docker, JSON, and `--fail-on` examples.
 
+## Tunnel and Tailnet Notes
+
+Tunnel or tailnet sidecars often appear in Compose files even when the target
+service itself has no host-published port. ExposeMap treats those as review hints,
+not reachability proof.
+
+See [docs/tunnel-tailnet-notes.md](docs/tunnel-tailnet-notes.md) for sanitized
+examples and recommended wording when discussing Cloudflare Tunnel or Tailnet-like
+layouts in public issues and documentation.
+
 ## Example Report
 
 See [examples/report.md](examples/report.md) for a generated sample.
