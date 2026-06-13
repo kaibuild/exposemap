@@ -176,6 +176,16 @@ layouts in public issues and documentation.
 
 See [examples/report.md](examples/report.md) for a generated sample.
 
+### Mermaid Legend
+
+The sample Mermaid report uses a short legend:
+
+- red: host-published services
+- amber: localhost-published services
+- blue: reverse-proxy hints
+- green: internal services
+- purple: services that still need manual review
+
 ## FAQ
 
 ### Does ExposeMap prove that a service is reachable from the internet?
